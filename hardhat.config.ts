@@ -19,12 +19,27 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
+// Libraries
+import assert from "assert";
+
+// @dev Put this in .env
+const ALCHEMY_ID = process.env.ALCHEMY_ID;
+assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
+  defaultNetwork: "hardhat",
   solidity: "0.8.4",
   networks: {
+    
+    hardhat: {
+      forking: {
+        url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+        blockNumber: 14068500,
+      },
+  },
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
