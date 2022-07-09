@@ -5,19 +5,19 @@ pragma solidity ^0.8.0;
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "hardhat/console.sol";
 
-import "./UserFactory.sol";
 
 address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
 //contract contains User Funds
-contract UserBank is ReentrancyGuard {
+contract UserScheduleBank is ReentrancyGuard {
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     mapping(address => mapping(address => uint256)) internal _userTokenBalances;
     mapping(address => EnumerableSet.AddressSet) internal _userTokens;
+    mapping(address => uint256) internal _userGasBalances;
+
 
     event FundsDeposited(
         address indexed sender,
@@ -29,6 +29,38 @@ contract UserBank is ReentrancyGuard {
         address indexed token,
         uint256 indexed amount
     );
+
+    function debitUserFunds(address _tokenAddress, uint256 _tokenAmount)
+        internal
+    {
+        uint256 userBalance = _userTokenBalances[msg.sender][_tokenAddress];
+
+        require(userBalance >= _tokenAmount, "Cannot withdraw more than deposited!");
+
+        _userTokenBalances[msg.sender][_tokenAddress] -= _tokenAmount;
+
+        if (_tokenAmount == userBalance) {
+            _userTokens[msg.sender].remove(_tokenAddress);
+        }
+    }
+
+    function depositGas()        
+    external
+    payable
+    {
+        uint256 depositAmount = msg.value;
+        _userGasBalances[msg.sender] = _userGasBalances[msg.sender] + depositAmount;
+        emit FundsDeposited(msg.sender, ETH, depositAmount);
+    }
+
+    function withdrawGas(uint256 _tokenAmount)        
+    external
+    nonReentrant
+    {
+        require(_userGasBalances[msg.sender] >= _tokenAmount, "Cannot withdraw more gas than deposited!");
+        _userGasBalances[msg.sender] = _userGasBalances[msg.sender] - _tokenAmount;
+        emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
+    }
 
     function depositFunds(address _tokenAddress, uint256 _tokenAmount)
         external
@@ -60,9 +92,7 @@ contract UserBank is ReentrancyGuard {
         external
         nonReentrant
     {
-        uint256 userBalance = _userTokenBalances[msg.sender][_tokenAddress];
-
-        _userTokenBalances[msg.sender][_tokenAddress] -= _tokenAmount;
+        debitUserFunds(_tokenAddress, _tokenAmount);
 
         if (_tokenAddress == ETH) {
             (bool success, ) = msg.sender.call{value: _tokenAmount}("");
@@ -75,11 +105,15 @@ contract UserBank is ReentrancyGuard {
             );
         }
 
-        if (_tokenAmount == userBalance) {
-            _userTokens[msg.sender].remove(_tokenAddress);
-        }
-
         emit FundsWithdrawn(msg.sender, _tokenAddress, _tokenAmount);
+    }
+
+    function getUserGasBalance()
+        public
+        view
+        returns (uint256)
+    {
+        return _userGasBalances[msg.sender];
     }
 
     function getUserTokenBalance(address _tokenAddress)

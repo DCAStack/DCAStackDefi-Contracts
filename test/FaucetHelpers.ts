@@ -1,6 +1,9 @@
 import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 
+export const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
+
 export const getTokenFromFaucet = async (
   tokenAddress: string,
   recepient: string,
@@ -66,7 +69,7 @@ export const getTokenFromFaucet = async (
 };
 
 // @dev Faucet addresses must have payable fallback function
-const getFaucetByToken = (tokenAddress: string): string => {
+export const getFaucetByToken = (tokenAddress: string): string => {
   switch (tokenAddress) {
     case "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee":
       return "0x742d35Cc6634C0532925a3b844Bc454e4438f44e";
