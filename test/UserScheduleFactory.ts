@@ -5,7 +5,7 @@ import { UserScheduleFactory, IERC20 } from "../typechain";
 import { BigNumber } from "ethers";
 import { getTokenFromFaucet, ETH, DAI, DAI_CHECKSUM } from "./FaucetHelpers";
 
-describe.only("UserScheduleFactory Test Suite", function () {
+describe("UserScheduleFactory Test Suite", function () {
   let UserScheduleFactory;
   let hardhatUserScheduleFactory: UserScheduleFactory;
   let owner: SignerWithAddress;
