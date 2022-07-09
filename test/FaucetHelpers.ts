@@ -3,6 +3,7 @@ import { ethers, network } from "hardhat";
 
 export const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
+export const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
 export const getTokenFromFaucet = async (
   tokenAddress: string,

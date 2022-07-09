@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { UserScheduleBank, IERC20 } from "../typechain";
 import { BigNumber } from "ethers";
-import { getTokenFromFaucet, ETH, DAI } from "./FaucetHelpers";
+import { getTokenFromFaucet, ETH, DAI, DAI_CHECKSUM } from "./FaucetHelpers";
 
 describe("UserBank Test Suite", function () {
   let UserScheduleBank;
@@ -149,7 +149,6 @@ describe("UserBank Test Suite", function () {
     it("Should deposit/withdraw DAI into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("2");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       await getTokenFromFaucet(DAI, addr1.address, depositAmount);
       await dai.connect(addr1).approve(hardhatUserScheduleBank.address, depositAmount);
@@ -184,7 +183,6 @@ describe("UserBank Test Suite", function () {
     it("Should deposit/withdraw all DAI into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       await getTokenFromFaucet(DAI, addr1.address, depositAmount);
       await dai.connect(addr1).approve(hardhatUserScheduleBank.address, depositAmount);
@@ -229,7 +227,6 @@ describe("UserBank Test Suite", function () {
 
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       //DAI deposit
       await getTokenFromFaucet(DAI, addr1.address, depositAmount);
@@ -339,7 +336,6 @@ describe("UserBank Test Suite", function () {
     it("Should deposit DAI into contract by addr1 but not accessible by addr2", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("2");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       //addr1 deposits
       await getTokenFromFaucet(DAI, addr1.address, depositAmount);
@@ -424,7 +420,6 @@ describe("UserBank Test Suite", function () {
     it("Should not let addr2 withdraw more DAI than balance by itself", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("2");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       //addr2 deposits
       await getTokenFromFaucet(DAI, addr2.address, depositAmount);
@@ -501,7 +496,6 @@ describe("UserBank Test Suite", function () {
     it("Should not let addr2 withdraw more DAI than balance with addr1 funds", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("0.1");
-      const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
       //addr1 deposits
       await getTokenFromFaucet(DAI, addr1.address, depositAmount);
