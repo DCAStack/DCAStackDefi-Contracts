@@ -34,22 +34,20 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   solidity: "0.8.4",
   networks: {
-    
     hardhat: {
+      accounts: {
+        accountsBalance: "10000000000000000000000000000000000000000", // 1 billion ETH
+      },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
-        blockNumber: 15117698,
+        blockNumber: 13779923,
       },
-  },
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,

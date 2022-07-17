@@ -10,7 +10,7 @@ import {
   DAI_CHECKSUM,
 } from "./FaucetHelpers";
 
-describe.only("UserScheduleBank Test Suite", function () {
+describe("UserScheduleBank Test Suite", function () {
   let UserScheduleBank;
   let hardhatUserScheduleBank: UserScheduleBank;
   let owner: SignerWithAddress;

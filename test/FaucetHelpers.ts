@@ -1,9 +1,10 @@
 import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 
-export const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
-export const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
+export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const DAI_ADDRESS = "0x6b175474e89094c44da98b954eedeac495271d0f";
+export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+export const DAI_CHECKSUM = ethers.utils.getAddress(DAI_ADDRESS);
 
 export const getTokenFromFaucet = async (
   tokenAddress: string,
@@ -34,7 +35,9 @@ export const getTokenFromFaucet = async (
     const ethFaucetSigner = await ethers.provider.getSigner(ethFaucet);
     const ethSignerBalance = await ethFaucetSigner.getBalance();
     if (ethSignerBalance.lt(oneEth))
-      throw Error(`ETH Faucet ${ethFaucet} has insufficient eth has only ${ethSignerBalance} but faucet requested ${oneEth}`);
+      throw Error(
+        `ETH Faucet ${ethFaucet} has insufficient eth has only ${ethSignerBalance} but faucet requested ${oneEth}`
+      );
     const ethTx = await ethFaucetSigner.sendTransaction({
       to: faucet,
       value: oneEth,
@@ -60,7 +63,9 @@ export const getTokenFromFaucet = async (
 
   const signerBalance = await token.balanceOf(faucet);
   if (signerBalance.lt(amount))
-    throw Error(`Faucet has insufficient: ${tokenAddress} has only ${signerBalance} but faucet requested ${amount}`);
+    throw Error(
+      `Faucet has insufficient: ${tokenAddress} has only ${signerBalance} but faucet requested ${amount}`
+    );
 
   const tx = await token.connect(faucetSigner).transfer(recepient, amount);
   await tx.wait();
