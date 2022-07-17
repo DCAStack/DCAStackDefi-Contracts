@@ -31,14 +31,18 @@ contract UserScheduleModifiers is UserScheduleFactory {
     function deleteSchedule(uint256 _dcaScheduleId)
         external
     {
-        delete userToDcaSchedules[msg.sender][_dcaScheduleId];
-        userToDcaSchedules[msg.sender][_dcaScheduleId] = userToDcaSchedules[msg.sender][userToDcaSchedules[msg.sender].length - 1];
-        userToDcaSchedules[msg.sender].pop();
+        delete _userToDcaSchedules[msg.sender][_dcaScheduleId];
+        _userToDcaSchedules[msg.sender][_dcaScheduleId] = _userToDcaSchedules[msg.sender][_userToDcaSchedules[msg.sender].length - 1];
+        _userToDcaSchedules[msg.sender].pop();
+
+        if (_userToDcaSchedules[msg.sender].length == 0){
+            removeUserFromSet();
+        }
     }
 
     function changeStatus(uint256 _dcaScheduleId, bool _newStatus)
         external
     {
-        userToDcaSchedules[msg.sender][_dcaScheduleId].isActive = _newStatus;
+        _userToDcaSchedules[msg.sender][_dcaScheduleId].isActive = _newStatus;
     }
 }
