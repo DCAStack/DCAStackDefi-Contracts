@@ -30,7 +30,7 @@ const tradeAmount = ethers.utils.parseEther("100");
 const tradeFreq = 1 * 86400; // trade daily
 const endDate = Math.floor(new Date().getTime() / 1000) + 86400; //add 1 day
 
-describe.only("UserScheduleTrade Test Suite", function () {
+describe("UserScheduleTrade Test Suite", function () {
   let UserScheduleTrade;
   let hhUserScheduleTrade: UserScheduleTrade;
   let owner: SignerWithAddress;

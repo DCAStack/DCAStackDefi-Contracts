@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -18,7 +18,6 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
     mapping(address => EnumerableSet.AddressSet) internal _userTokens;
     mapping(address => uint256) public userGasBalances;
 
-
     event FundsDeposited(
         address indexed sender,
         address indexed token,
@@ -30,27 +29,28 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
         uint256 indexed amount
     );
 
-    function removeUserToken(address _user, address _token) internal onlyOwner{
+    function removeUserToken(address _user, address _token) internal onlyOwner {
         if (userTokenBalances[_user][_token] == 0) {
             _userTokens[_user].remove(_token);
         }
     }
 
-    function depositGas()        
-    external
-    payable
-    {
+    function depositGas() external payable {
         uint256 depositAmount = msg.value;
-        userGasBalances[msg.sender] = userGasBalances[msg.sender] + depositAmount;
+        userGasBalances[msg.sender] =
+            userGasBalances[msg.sender] +
+            depositAmount;
         emit FundsDeposited(msg.sender, ETH, depositAmount);
     }
 
-    function withdrawGas(uint256 _tokenAmount)        
-    external
-    nonReentrant
-    {
-        require(userGasBalances[msg.sender] >= _tokenAmount, "Cannot withdraw more gas than deposited!");
-        userGasBalances[msg.sender] = userGasBalances[msg.sender] - _tokenAmount;
+    function withdrawGas(uint256 _tokenAmount) external nonReentrant {
+        require(
+            userGasBalances[msg.sender] >= _tokenAmount,
+            "Cannot withdraw more gas than deposited!"
+        );
+        userGasBalances[msg.sender] =
+            userGasBalances[msg.sender] -
+            _tokenAmount;
         emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
     }
 
@@ -86,7 +86,10 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
     {
         uint256 userBalance = userTokenBalances[msg.sender][_tokenAddress];
 
-        require(userBalance >= _tokenAmount, "Cannot withdraw more than deposited!");
+        require(
+            userBalance >= _tokenAmount,
+            "Cannot withdraw more than deposited!"
+        );
 
         userTokenBalances[msg.sender][_tokenAddress] -= _tokenAmount;
 

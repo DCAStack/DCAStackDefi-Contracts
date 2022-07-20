@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
@@ -37,7 +37,7 @@ contract UserScheduleFactory is UserScheduleBank {
         uint256 lastRun;
         uint256 nextRun;
         uint256 endDate;
-        bytes swapCallData;
+        // bytes swapCallData;
         // uint256 remainingExec;
         // uint256 totalExec;
     }
@@ -168,14 +168,14 @@ contract UserScheduleFactory is UserScheduleBank {
     }
 
     //1inch call data only populated by owner to prevent mischief
-    function populateUserSwapCallData(
-        address dcaOwner,
-        uint256 _dcaScheduleId,
-        bytes memory swapCallData
-    ) external onlyOwner {
-        _userToDcaSchedules[dcaOwner][_dcaScheduleId]
-            .swapCallData = swapCallData;
-    }
+    // function populateUserSwapCallData(
+    //     address dcaOwner,
+    //     uint256 _dcaScheduleId,
+    //     bytes memory swapCallData
+    // ) external onlyOwner {
+    //     _userToDcaSchedules[dcaOwner][_dcaScheduleId]
+    //         .swapCallData = swapCallData;
+    // }
 
     function createDcaSchedule(
         uint256 _tradeFrequency,
@@ -215,8 +215,7 @@ contract UserScheduleFactory is UserScheduleBank {
                 _startDate,
                 0,
                 _startDate,
-                _endDate,
-                ""
+                _endDate
                 // totalExec,
                 // totalExec
             )
