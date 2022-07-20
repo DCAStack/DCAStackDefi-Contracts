@@ -2,9 +2,13 @@ import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
 export const DAI_ADDRESS = "0x6b175474e89094c44da98b954eedeac495271d0f";
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const DAI_CHECKSUM = ethers.utils.getAddress(DAI_ADDRESS);
+
+export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+export const WETH_CHECKSUM = ethers.utils.getAddress(WETH_ADDRESS);
+
 
 export const getTokenFromFaucet = async (
   tokenAddress: string,
