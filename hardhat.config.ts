@@ -32,7 +32,15 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
-  solidity: "0.8.9",
+  solidity: {
+    version: "0.8.9",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1
+      }
+    }
+  },
   networks: {
     hardhat: {
       accounts: {

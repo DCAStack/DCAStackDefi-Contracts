@@ -36,57 +36,57 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
         uint256 currentDateTime
     ) internal nonReentrant onlyOwner {
         //first, update sell amounts for dcaOwner
-        _userToDcaSchedules[dcaOwner][scheduleId].remainingBudget =
-            _userToDcaSchedules[dcaOwner][scheduleId].remainingBudget -
+        userToDcaSchedules[dcaOwner][scheduleId].remainingBudget =
+            userToDcaSchedules[dcaOwner][scheduleId].remainingBudget -
             soldAmount;
         userTokenBalances[dcaOwner][
-            _userToDcaSchedules[dcaOwner][scheduleId].sellToken
+            userToDcaSchedules[dcaOwner][scheduleId].sellToken
         ] =
             userTokenBalances[dcaOwner][
-                _userToDcaSchedules[dcaOwner][scheduleId].sellToken
+                userToDcaSchedules[dcaOwner][scheduleId].sellToken
             ] -
             soldAmount;
 
         //if rem budget or user bal is empty, schedule gets paused
         if (
-            _userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0 ||
+            userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0 ||
             userTokenBalances[dcaOwner][
-                _userToDcaSchedules[dcaOwner][scheduleId].sellToken
+                userToDcaSchedules[dcaOwner][scheduleId].sellToken
             ] ==
             0
         ) {
-            _userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
-            _userToDcaSchedules[dcaOwner][scheduleId].nextRun = 0;
+            userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
+            userToDcaSchedules[dcaOwner][scheduleId].nextRun = 0;
         } else {
             //if still good, update next run
-            _userToDcaSchedules[dcaOwner][scheduleId].nextRun =
+            userToDcaSchedules[dcaOwner][scheduleId].nextRun =
                 currentDateTime +
-                _userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
+                userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
         }
 
         //remove tokens from set if empty
         removeUserToken(
             dcaOwner,
-            _userToDcaSchedules[dcaOwner][scheduleId].sellToken
+            userToDcaSchedules[dcaOwner][scheduleId].sellToken
         );
 
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][
-            _userToDcaSchedules[dcaOwner][scheduleId].buyToken
+            userToDcaSchedules[dcaOwner][scheduleId].buyToken
         ] =
             userTokenBalances[dcaOwner][
-                _userToDcaSchedules[dcaOwner][scheduleId].buyToken
+                userToDcaSchedules[dcaOwner][scheduleId].buyToken
             ] +
             boughtAmount;
 
         //third, update schedule last run time
-        _userToDcaSchedules[dcaOwner][scheduleId].lastRun = currentDateTime;
+        userToDcaSchedules[dcaOwner][scheduleId].lastRun = currentDateTime;
 
         //finally, update gas balance for user
         userGasBalances[dcaOwner] -= gasUsed;
 
         //finally emit event with all the updates/details
-        DcaSchedule memory u = _userToDcaSchedules[dcaOwner][scheduleId];
+        DcaSchedule memory u = userToDcaSchedules[dcaOwner][scheduleId];
         uint256 remGas = userGasBalances[dcaOwner];
         {
             emit BoughtTokens(
@@ -124,21 +124,20 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
 
         //schedule not ready to execute
         require(
-            currentDateTime >=
-                _userToDcaSchedules[dcaOwner][scheduleId].nextRun,
+            currentDateTime >= userToDcaSchedules[dcaOwner][scheduleId].nextRun,
             "User schedule not ready!"
         );
 
         //schedule not active
         require(
-            _userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
+            userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
             "User schedule paused!"
         );
 
         //check if user has enough for trade
-        address sellTokenAddress = _userToDcaSchedules[dcaOwner][scheduleId]
+        address sellTokenAddress = userToDcaSchedules[dcaOwner][scheduleId]
             .sellToken;
-        uint256 sellAmount = _userToDcaSchedules[dcaOwner][scheduleId]
+        uint256 sellAmount = userToDcaSchedules[dcaOwner][scheduleId]
             .tradeAmount;
         require(
             userTokenBalances[dcaOwner][sellTokenAddress] >= sellAmount,
@@ -147,18 +146,15 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
 
         // //schedule has no budget left
         // require(
-        //     _userToDcaSchedules[dcaOwner][scheduleId].remainingBudget >=
+        //     userToDcaSchedules[dcaOwner][scheduleId].remainingBudget >=
         //         sellAmount,
         //     "User schedule fund insufficient!"
         // );
 
         IERC20 sellToken = IERC20(sellTokenAddress);
         IERC20 buyToken = IERC20(
-            _userToDcaSchedules[dcaOwner][scheduleId].buyToken
+            userToDcaSchedules[dcaOwner][scheduleId].buyToken
         );
-
-        //get current gas
-        // uint256 startGas = gasleft();
 
         //approve sell token max
         if (!isETH(sellToken)) {
@@ -217,15 +213,6 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
             soldAmount = soldAmount - address(this).balance;
         }
 
-        //get updated gas balance
-        // uint256 gasUsed = startGas - gasleft();
-
-        // console.log("owner: ", dcaOwner);
-        // console.log("id: ", scheduleId);
-        // console.log("soldAmount: ", soldAmount);
-        // console.log("boughtAmount: ", boughtAmount);
-        // console.log("gasUsed: ", gasUsed);
-
         updateUserDCA(
             dcaOwner,
             scheduleId,
@@ -235,72 +222,6 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
             currentDateTime
         );
     }
-
-    // function runSchedules(uint256 currentDateTime, uint256 currentGasPrice)
-    //     external
-    //     onlyOwner
-    // {
-    //     address[] memory retrieveUsers = getUsers();
-    //     uint256 allUsers = retrieveUsers.length;
-
-    //     //iterate owners
-    //     for (uint256 i; i < allUsers; i++) {
-    //         address checkOwner = retrieveUsers[i];
-
-    //         uint256 ownerScheduleLength = _userToDcaSchedules[checkOwner]
-    //             .length;
-    //         bool[] memory scheduleRanNotification = new bool[](
-    //             ownerScheduleLength
-    //         );
-    //         bool gasBalNotify = false;
-
-    //         //check gas
-    //         if (userGasBalances[checkOwner] > currentGasPrice) {
-    //             //iterate owner schedules
-    //             for (uint256 j; j < ownerScheduleLength; j++) {
-    //                 //check token
-    //                 address sellToken = _userToDcaSchedules[checkOwner][j]
-    //                     .sellToken;
-    //                 uint256 tradeAmount = _userToDcaSchedules[checkOwner][j]
-    //                     .tradeAmount;
-    //                 if (
-    //                     userTokenBalances[checkOwner][sellToken] >= tradeAmount
-    //                 ) {
-    //                     //check if schedule is active
-    //                     if (
-    //                         _userToDcaSchedules[checkOwner][j].isActive == true
-    //                     ) {
-    //                         //check if schedule has remaining budget
-    //                         if (
-    //                             _userToDcaSchedules[checkOwner][j]
-    //                                 .remainingBudget > 0
-    //                         ) {
-    //                             //check if schedule is ready to execute
-    //                             {
-    //                                 if (
-    //                                     currentDateTime >=
-    //                                     _userToDcaSchedules[checkOwner][j]
-    //                                         .nextRun
-    //                                 ) {
-    //                                     //return ready schedules
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 } else {
-    //                     //notify user for insufficient balance
-    //                     scheduleRanNotification[j] = false;
-    //                 }
-    //             }
-    //         } else {
-    //             //notify user for low gas
-    //             gasBalNotify = true;
-    //         }
-
-    //         //emit event
-    //         // emit NotifyOwner(checkOwner, scheduleRanNotification, gasBalNotify);
-    //     }
-    // }
 
     // Payable fallback to allow this contract to receive protocol fee refunds.
     receive() external payable {}
