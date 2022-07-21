@@ -5,7 +5,6 @@ pragma solidity ^0.8.9;
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./UserScheduleBank.sol";
-import "hardhat/console.sol";
 
 //create new user schedule and validate
 contract UserScheduleFactory is UserScheduleBank {
@@ -69,14 +68,14 @@ contract UserScheduleFactory is UserScheduleBank {
         DcaSchedule[] memory allUserSchedules = getUserSchedules();
 
         uint256 totalUserDeposit = userTokenBalances[msg.sender][_tokenAddress];
-        uint256 freeDepositBal = 0;
-        uint256 committedBal = 0;
-        uint256 userSchedulesLength = allUserSchedules.length;
+        uint256 freeDepositBal;
 
-        if (userSchedulesLength == 0) {
+        if (allUserSchedules.length == 0) {
             freeDepositBal = totalUserDeposit;
         } else {
-            for (uint256 i; i < userSchedulesLength; i++) {
+            uint256 committedBal;
+
+            for (uint256 i; i < allUserSchedules.length; i++) {
                 if (allUserSchedules[i].sellToken == _tokenAddress) {
                     committedBal += allUserSchedules[i].remainingBudget;
                 }
@@ -95,14 +94,8 @@ contract UserScheduleFactory is UserScheduleBank {
         uint256 _endDate
     ) public pure returns (uint256) {
         //validation checks
-        require(
-            _endDate > _startDate,
-            "End date needs to be greater than start date!"
-        );
-        require(
-            (_endDate - _startDate) >= _tradeFrequency,
-            "Trade frequency greater than possible executions!"
-        );
+        require(_endDate > _startDate, "Invalid dates!");
+        require((_endDate - _startDate) >= _tradeFrequency, "Invalid exec!");
 
         return ((_endDate - _startDate) / (_tradeFrequency));
     }
@@ -121,8 +114,8 @@ contract UserScheduleFactory is UserScheduleBank {
             _endDate
         );
 
-        require(totalExecutions > 0, "Please enter valid values!");
-        require(_tradeAmount > 0, "Trade amount has to be greater than 0!");
+        require(totalExecutions > 0, "Invalid!");
+        require(_tradeAmount > 0, "Not 0!");
 
         uint256 totalBudget = _tradeAmount * totalExecutions;
         uint256 gotFreeTokenBalance = getFreeTokenBalance(_sellToken);
@@ -144,7 +137,7 @@ contract UserScheduleFactory is UserScheduleBank {
         uint256 _tradeFrequency,
         uint256 _startDate,
         uint256 _endDate
-    ) public view returns (bool) {
+    ) public view {
         uint256 currTokenBalance = getFreeTokenBalance(_sellToken);
         uint256 checkAmount = calculateDeposit(
             _tradeAmount,
@@ -153,15 +146,10 @@ contract UserScheduleFactory is UserScheduleBank {
             _endDate,
             _sellToken
         );
-        require(
-            currTokenBalance >= checkAmount,
-            "Please deposit more to start this DCA schedule!"
-        );
+        require(currTokenBalance >= checkAmount, "Low balance!");
 
         uint256 currGasBalance = userGasBalances[msg.sender];
-        require(currGasBalance > 0, "Please deposit more gas to start!");
-
-        return true;
+        require(currGasBalance > 0, "Low gas!");
     }
 
     function createDcaSchedule(

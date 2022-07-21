@@ -489,8 +489,8 @@ describe("UserScheduleFactory Test Suite", function () {
         .connect(addr1)
         .depositGas({ value: ethers.utils.parseEther("1") });
 
-      expect(
-        await hardhatUserScheduleFactory
+      await expect(
+        hardhatUserScheduleFactory
           .connect(addr1)
           .validateDcaSchedule(
             ETH_ADDRESS,
@@ -499,7 +499,7 @@ describe("UserScheduleFactory Test Suite", function () {
             startDate,
             endDate
           )
-      ).to.eq(true);
+      ).to.not.be.reverted;
     });
 
     it("Should validate schedule DAI_ADDRESS", async function () {
@@ -554,8 +554,8 @@ describe("UserScheduleFactory Test Suite", function () {
         .connect(addr1)
         .depositGas({ value: ethers.utils.parseEther("1") });
 
-      expect(
-        await hardhatUserScheduleFactory
+      await expect(
+        hardhatUserScheduleFactory
           .connect(addr1)
           .validateDcaSchedule(
             DAI_ADDRESS,
@@ -564,7 +564,7 @@ describe("UserScheduleFactory Test Suite", function () {
             startDate,
             endDate
           )
-      ).to.eq(true);
+      ).to.not.be.reverted;
     });
 
     it("Should validate schedule invalid", async function () {

@@ -2,12 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import "./UserScheduleBank.sol";
 import "./UserScheduleFactory.sol";
-import "hardhat/console.sol";
 
 //contract executes User DCA Schedules
-contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
+contract UserScheduleTrade is UserScheduleFactory {
     address constant AGG_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
     uint256 MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
@@ -117,21 +115,18 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
         bytes memory swapCallData
     ) external payable onlyOwner {
         //not enough gas check
-        require(
-            userGasBalances[dcaOwner] > currentGasPrice,
-            "User low on gas!"
-        );
+        require(userGasBalances[dcaOwner] > currentGasPrice, "Low Gas!");
 
         //schedule not ready to execute
         require(
             currentDateTime >= userToDcaSchedules[dcaOwner][scheduleId].nextRun,
-            "User schedule not ready!"
+            "Not Ready!"
         );
 
         //schedule not active
         require(
             userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
-            "User schedule paused!"
+            "Paused!"
         );
 
         //check if user has enough for trade
@@ -141,15 +136,8 @@ contract UserScheduleTrade is UserScheduleBank, UserScheduleFactory {
             .tradeAmount;
         require(
             userTokenBalances[dcaOwner][sellTokenAddress] >= sellAmount,
-            "User token balance insufficient!"
+            "Low Balance!"
         );
-
-        // //schedule has no budget left
-        // require(
-        //     userToDcaSchedules[dcaOwner][scheduleId].remainingBudget >=
-        //         sellAmount,
-        //     "User schedule fund insufficient!"
-        // );
 
         IERC20 sellToken = IERC20(sellTokenAddress);
         IERC20 buyToken = IERC20(
