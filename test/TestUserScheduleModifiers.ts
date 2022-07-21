@@ -3,6 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { UserScheduleModifiers, IERC20 } from "../typechain";
 import { ETH_ADDRESS, DAI_ADDRESS, DAI_CHECKSUM } from "./FaucetHelpers";
+import { BigNumber } from "ethers";
 
 const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
 const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
@@ -110,6 +111,11 @@ describe("UserScheduleFactory Test Suite", function () {
 
   describe("Schedule Modifier Delete", function () {
     it("Should delete schedule", async function () {
+
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("1")]]);
+
       let getSchedules = await hardhatUserScheduleModifiers
         .connect(addr1)
         .getUserSchedules();
@@ -121,6 +127,12 @@ describe("UserScheduleFactory Test Suite", function () {
         .connect(addr1)
         .getUserSchedules();
       expect(getSchedules.length).to.equal(0);
+
+
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[], []]);
+
     });
 
     it("Should delete schedule multiple", async function () {
@@ -155,6 +167,10 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(10);
 
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("10")]]);
+
       //delete first
       await hardhatUserScheduleModifiers.connect(addr1).deleteSchedule(0);
 
@@ -162,6 +178,10 @@ describe("UserScheduleFactory Test Suite", function () {
         .connect(addr1)
         .getUserSchedules();
       expect(getSchedules.length).to.equal(9);
+
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("9")]]);
 
       for (let i = 0; i < getSchedules.length; i++) {
         expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
@@ -175,6 +195,10 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(8);
 
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("8")]]);
+
       for (let i = 0; i < getSchedules.length; i++) {
         expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
       }
@@ -187,6 +211,10 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(7);
 
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("7")]]);
+
       for (let i = 0; i < getSchedules.length; i++) {
         expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
       }
@@ -198,6 +226,10 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(1);
 
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("1")]]);
+
       await expect(
         hardhatUserScheduleModifiers.connect(addr1).deleteSchedule(1)
       ).to.be.reverted;
@@ -206,6 +238,11 @@ describe("UserScheduleFactory Test Suite", function () {
         .connect(addr1)
         .getUserSchedules();
       expect(getSchedules.length).to.equal(1);
+
+      expect(
+        await hardhatUserScheduleModifiers.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("1")]]);
+
     });
 
     it("Should NOT delete schedule multiuser", async function () {

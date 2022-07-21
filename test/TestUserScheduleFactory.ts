@@ -609,7 +609,7 @@ describe("UserScheduleFactory Test Suite", function () {
   });
 
   describe("Schedule Creation", function () {
-    it("Should create daily DCA schedule for DAI_ADDRESS/ETH_ADDRESS", async function () {
+    it("Should create daily DCA schedule for DAI/ETH", async function () {
       let getSchedules = await hardhatUserScheduleFactory
         .connect(addr1)
         .getUserSchedules();
@@ -968,4 +968,113 @@ describe("UserScheduleFactory Test Suite", function () {
       ).to.be.reverted;
     });
   });
+
+
+  describe("Retrieve Users Schedules Data", function () {
+    it("Should get all users and their total schedules", async function () {
+
+
+      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
+      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
+      const tradeAmount = ethers.utils.parseEther("1");
+      const tradeFreq = 1 * 86400; //trade daily
+
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, ethers.utils.parseEther("7"), {
+          value: ethers.utils.parseEther("7"),
+        });
+
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: ethers.utils.parseEther("1") });
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            tradeFreq,
+            tradeAmount,
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            startDate,
+            endDate
+          )
+      )
+        .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
+        .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
+
+      expect(
+        await hardhatUserScheduleFactory.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address], [BigNumber.from("1")]]);
+
+
+      hardhatUserScheduleFactory
+        .connect(addr2)
+        .depositFunds(ETH_ADDRESS, ethers.utils.parseEther("7"), {
+          value: ethers.utils.parseEther("7"),
+        });
+
+
+      hardhatUserScheduleFactory
+        .connect(addr2)
+        .depositGas({ value: ethers.utils.parseEther("1") });
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr2)
+          .createDcaSchedule(
+            tradeFreq,
+            tradeAmount,
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            startDate,
+            endDate
+          )
+      )
+        .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
+        .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr2.address);
+
+
+      expect(
+        await hardhatUserScheduleFactory.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address, addr2.address], [BigNumber.from("1"), BigNumber.from("1")]]);
+
+      hardhatUserScheduleFactory
+        .connect(addr2)
+        .depositFunds(ETH_ADDRESS, ethers.utils.parseEther("7"), {
+          value: ethers.utils.parseEther("7"),
+        });
+
+
+      hardhatUserScheduleFactory
+        .connect(addr2)
+        .depositGas({ value: ethers.utils.parseEther("1") });
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr2)
+          .createDcaSchedule(
+            tradeFreq,
+            tradeAmount,
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            startDate,
+            endDate
+          )
+      )
+        .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
+        .withArgs(1, DAI_CHECKSUM, ETH_ADDRESS, addr2.address);
+
+      expect(
+        await hardhatUserScheduleFactory.getAllUsersSchedules()
+      ).to.deep.equal([[addr1.address, addr2.address], [BigNumber.from("1"), BigNumber.from("2")]]);
+
+    });
+
+
+  });
+
 });

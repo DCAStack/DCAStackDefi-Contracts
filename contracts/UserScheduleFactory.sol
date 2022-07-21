@@ -7,12 +7,6 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 import "./UserScheduleBank.sol";
 import "hardhat/console.sol";
 
-// //use errors instead of require
-// error InvalidDateRange(uint256 startDate, uint256 endDate);
-// error InvalidFrequency(uint256 tradeFrequency);
-// error InvalidDuration(uint256 tradeOn);
-// error InvalidExecutions(uint256 possibleExc, uint256 tradeFrequency);
-
 //create new user schedule and validate
 contract UserScheduleFactory is UserScheduleBank {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -37,22 +31,25 @@ contract UserScheduleFactory is UserScheduleBank {
         uint256 lastRun;
         uint256 nextRun;
         uint256 endDate;
-        // bytes swapCallData;
-        // uint256 remainingExec;
-        // uint256 totalExec;
     }
 
-    mapping(address => DcaSchedule[]) internal _userToDcaSchedules;
+    mapping(address => DcaSchedule[]) public userToDcaSchedules;
     EnumerableSet.AddressSet internal _userAddresses;
 
-    function getUsers() internal view returns (address[] memory) {
+    function getAllUsersSchedules()
+        external
+        view
+        returns (address[] memory, uint256[] memory)
+    {
         uint256 length = _userAddresses.length();
         address[] memory retrieveUsers = new address[](length);
+        uint256[] memory totalSchedules = new uint256[](length);
 
         for (uint256 i; i < length; i++) {
             retrieveUsers[i] = _userAddresses.at(i);
+            totalSchedules[i] = userToDcaSchedules[retrieveUsers[i]].length;
         }
-        return retrieveUsers;
+        return (retrieveUsers, totalSchedules);
     }
 
     function removeUserFromSet() internal {
@@ -60,7 +57,7 @@ contract UserScheduleFactory is UserScheduleBank {
     }
 
     function getUserSchedules() public view returns (DcaSchedule[] memory) {
-        return _userToDcaSchedules[msg.sender];
+        return userToDcaSchedules[msg.sender];
     }
 
     //get funds deposited not in use by schedules (includes paused)
@@ -167,16 +164,6 @@ contract UserScheduleFactory is UserScheduleBank {
         return true;
     }
 
-    //1inch call data only populated by owner to prevent mischief
-    // function populateUserSwapCallData(
-    //     address dcaOwner,
-    //     uint256 _dcaScheduleId,
-    //     bytes memory swapCallData
-    // ) external onlyOwner {
-    //     _userToDcaSchedules[dcaOwner][_dcaScheduleId]
-    //         .swapCallData = swapCallData;
-    // }
-
     function createDcaSchedule(
         uint256 _tradeFrequency,
         uint256 _tradeAmount,
@@ -202,7 +189,7 @@ contract UserScheduleFactory is UserScheduleBank {
 
         _userAddresses.add(msg.sender);
 
-        _userToDcaSchedules[msg.sender].push(
+        userToDcaSchedules[msg.sender].push(
             DcaSchedule(
                 msg.sender,
                 _tradeFrequency,
@@ -216,13 +203,11 @@ contract UserScheduleFactory is UserScheduleBank {
                 0,
                 _startDate,
                 _endDate
-                // totalExec,
-                // totalExec
             )
         );
 
         emit NewUserSchedule(
-            _userToDcaSchedules[msg.sender].length - 1,
+            userToDcaSchedules[msg.sender].length - 1,
             _buyToken,
             _sellToken,
             msg.sender
