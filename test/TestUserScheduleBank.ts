@@ -43,6 +43,10 @@ describe("UserScheduleBank Test Suite", function () {
         await hardhatUserScheduleBank.userGasBalances(addr1.address)
       ).to.equal(depositAmount);
 
+      expect(
+        await hardhatUserScheduleBank.getAllUsersGasBalances()
+      ).to.equal(depositAmount);
+
       await expect(
         hardhatUserScheduleBank.connect(addr1).withdrawGas(withdrawAmount)
       )
@@ -51,6 +55,10 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.userGasBalances(addr1.address)
+      ).to.equal(withdrawAmount);
+
+      expect(
+        await hardhatUserScheduleBank.getAllUsersGasBalances()
       ).to.equal(withdrawAmount);
 
       await expect(
@@ -63,6 +71,10 @@ describe("UserScheduleBank Test Suite", function () {
         await hardhatUserScheduleBank.userGasBalances(addr1.address)
       ).to.equal(0);
 
+      expect(
+        await hardhatUserScheduleBank.getAllUsersGasBalances()
+      ).to.equal(0);
+
       await expect(
         hardhatUserScheduleBank.connect(addr1).withdrawGas(withdrawAmount)
       )
@@ -72,9 +84,13 @@ describe("UserScheduleBank Test Suite", function () {
       expect(
         await hardhatUserScheduleBank.userGasBalances(addr1.address)
       ).to.equal(0);
+
+      expect(
+        await hardhatUserScheduleBank.getAllUsersGasBalances()
+      ).to.equal(0);
     });
 
-    it("Should deposit/withdraw ETH_ADDRESS into contract by addr1", async function () {
+    it("Should deposit/withdraw ETH into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("0.5");
 
@@ -117,7 +133,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[ETH_ADDRESS], [withdrawAmount]]);
     });
 
-    it("Should deposit/withdraw all ETH_ADDRESS into contract by addr1", async function () {
+    it("Should deposit/withdraw all ETH into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
 
@@ -160,7 +176,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[], []]);
     });
 
-    it("Should deposit/withdraw DAI_ADDRESS into contract by addr1", async function () {
+    it("Should deposit/withdraw DAI into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("2");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
 
@@ -204,7 +220,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.equal(withdrawAmount);
     });
 
-    it("Should deposit/withdraw all DAI_ADDRESS into contract by addr1", async function () {
+    it("Should deposit/withdraw all DAI into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
 
@@ -254,7 +270,7 @@ describe("UserScheduleBank Test Suite", function () {
   });
 
   describe("Transactions Multiasset", function () {
-    it("Should deposit/withdraw ETH_ADDRESS+DAI_ADDRESS into contract by addr1", async function () {
+    it("Should deposit/withdraw ETH+DAI into contract by addr1", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
 
@@ -349,7 +365,7 @@ describe("UserScheduleBank Test Suite", function () {
   });
 
   describe("Transactions Multiuser", function () {
-    it("Should deposit ETH_ADDRESS into contract by addr1 but not accessible by addr2", async function () {
+    it("Should deposit ETH into contract by addr1 but not accessible by addr2", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("0.5");
 
@@ -386,7 +402,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[], []]);
     });
 
-    it("Should deposit DAI_ADDRESS into contract by addr1 but not accessible by addr2", async function () {
+    it("Should deposit DAI into contract by addr1 but not accessible by addr2", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("2");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("1");
 
@@ -444,7 +460,7 @@ describe("UserScheduleBank Test Suite", function () {
   });
 
   describe("Transactions Invalid", function () {
-    it("Should not let addr2 withdraw more ETH_ADDRESS than balance by itself", async function () {
+    it("Should not let addr2 withdraw more ETH than balance by itself", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("2");
 
@@ -489,7 +505,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
     });
 
-    it("Should not let addr2 withdraw more DAI_ADDRESS than balance by itself", async function () {
+    it("Should not let addr2 withdraw more DAI than balance by itself", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("2");
 
@@ -538,7 +554,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
     });
 
-    it("Should not let addr2 withdraw more ETH_ADDRESS than balance with addr1 funds", async function () {
+    it("Should not let addr2 withdraw more ETH than balance with addr1 funds", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("0.1");
 
@@ -583,7 +599,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([[], []]);
     });
 
-    it("Should not let addr2 withdraw more DAI_ADDRESS than balance with addr1 funds", async function () {
+    it("Should not let addr2 withdraw more DAI than balance with addr1 funds", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       const withdrawAmount: BigNumber = ethers.utils.parseEther("0.1");
 

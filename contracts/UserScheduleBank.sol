@@ -27,6 +27,8 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
         userGasBalances[msg.sender] =
             userGasBalances[msg.sender] +
             depositAmount;
+
+        addUserGasAddress(msg.sender);
         emit FundsDeposited(msg.sender, ETH, depositAmount);
     }
 
@@ -38,6 +40,8 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
         userGasBalances[msg.sender] =
             userGasBalances[msg.sender] -
             _tokenAmount;
+
+        removeUserGasAddress(msg.sender);
         emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
     }
 
@@ -92,23 +96,5 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
         removeUserToken(msg.sender, _tokenAddress);
 
         emit FundsWithdrawn(msg.sender, _tokenAddress, _tokenAmount);
-    }
-
-    function getUserAllTokenBalances()
-        external
-        view
-        returns (address[] memory, uint256[] memory)
-    {
-        uint256 length = getUserTokenLength(msg.sender);
-        address[] memory retrieveUserTokens = new address[](length);
-        uint256[] memory retrieveUserBalances = new uint256[](length);
-
-        for (uint256 i; i < length; i++) {
-            retrieveUserTokens[i] = getUserTokenAt(msg.sender, i);
-            retrieveUserBalances[i] = userTokenBalances[msg.sender][
-                retrieveUserTokens[i]
-            ];
-        }
-        return (retrieveUserTokens, retrieveUserBalances);
     }
 }
