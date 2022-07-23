@@ -21,9 +21,7 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         ][userToDcaSchedules[msg.sender].length - 1];
         userToDcaSchedules[msg.sender].pop();
 
-        if (userToDcaSchedules[msg.sender].length == 0) {
-            removeUserFromSet();
-        }
+        removeUserFromSet();
     }
 
     function changeStatus(uint256 _dcaScheduleId, bool _newStatus) external {

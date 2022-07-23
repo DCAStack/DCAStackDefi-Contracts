@@ -47,7 +47,8 @@ contract UserScheduleData {
     }
 
     function removeUserFromSet() internal {
-        _userAddresses.remove(msg.sender);
+        if (userToDcaSchedules[msg.sender].length == 0) {
+            _userAddresses.remove(msg.sender);
+        }
     }
-
 }

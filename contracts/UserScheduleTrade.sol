@@ -70,6 +70,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             dcaOwner,
             userToDcaSchedules[dcaOwner][scheduleId].sellToken
         );
+        removeUserGasAddress(dcaOwner);
 
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][
