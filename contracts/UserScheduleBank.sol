@@ -4,19 +4,12 @@ pragma solidity ^0.8.9;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+import "./UserBankData.sol";
 
 //contract contains User Funds
-contract UserScheduleBank is ReentrancyGuard, Ownable {
+contract UserScheduleBank is UserBankData, ReentrancyGuard {
     using SafeERC20 for IERC20;
-    using EnumerableSet for EnumerableSet.AddressSet;
-
-    mapping(address => mapping(address => uint256)) public userTokenBalances;
-    mapping(address => EnumerableSet.AddressSet) internal _userTokens;
-    mapping(address => uint256) public userGasBalances;
 
     event FundsDeposited(
         address indexed sender,
@@ -28,12 +21,6 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
         address indexed token,
         uint256 indexed amount
     );
-
-    function removeUserToken(address _user, address _token) internal onlyOwner {
-        if (userTokenBalances[_user][_token] == 0) {
-            _userTokens[_user].remove(_token);
-        }
-    }
 
     function depositGas() external payable {
         uint256 depositAmount = msg.value;
@@ -73,9 +60,7 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
             userTokenBalances[msg.sender][_tokenAddress] +
             depositAmount;
 
-        if (!_userTokens[msg.sender].contains(_tokenAddress)) {
-            _userTokens[msg.sender].add(_tokenAddress);
-        }
+        addUserToken(msg.sender, _tokenAddress);
 
         emit FundsDeposited(msg.sender, _tokenAddress, depositAmount);
     }
@@ -104,9 +89,7 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
             );
         }
 
-        if (_tokenAmount == userBalance) {
-            _userTokens[msg.sender].remove(_tokenAddress);
-        }
+        removeUserToken(msg.sender, _tokenAddress);
 
         emit FundsWithdrawn(msg.sender, _tokenAddress, _tokenAmount);
     }
@@ -116,12 +99,12 @@ contract UserScheduleBank is ReentrancyGuard, Ownable {
         view
         returns (address[] memory, uint256[] memory)
     {
-        uint256 length = _userTokens[msg.sender].length();
+        uint256 length = getUserTokenLength(msg.sender);
         address[] memory retrieveUserTokens = new address[](length);
         uint256[] memory retrieveUserBalances = new uint256[](length);
 
         for (uint256 i; i < length; i++) {
-            retrieveUserTokens[i] = _userTokens[msg.sender].at(i);
+            retrieveUserTokens[i] = getUserTokenAt(msg.sender, i);
             retrieveUserBalances[i] = userTokenBalances[msg.sender][
                 retrieveUserTokens[i]
             ];

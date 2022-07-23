@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { UserScheduleBank, IERC20 } from "../typechain";
+import { DCAStack, IERC20 } from "../typechain";
 import { BigNumber } from "ethers";
 import {
   getTokenFromFaucet,
@@ -11,8 +11,8 @@ import {
 } from "./FaucetHelpers";
 
 describe("UserScheduleBank Test Suite", function () {
-  let UserScheduleBank;
-  let hardhatUserScheduleBank: UserScheduleBank;
+  let DCAStack;
+  let hardhatUserScheduleBank: DCAStack;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
   let addr2: SignerWithAddress;
@@ -20,9 +20,9 @@ describe("UserScheduleBank Test Suite", function () {
   let dai: IERC20;
 
   beforeEach(async function () {
-    UserScheduleBank = await ethers.getContractFactory("UserScheduleBank");
+    DCAStack = await ethers.getContractFactory("DCAStack");
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-    hardhatUserScheduleBank = await UserScheduleBank.deploy();
+    hardhatUserScheduleBank = await DCAStack.deploy();
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI_ADDRESS);
   });
 

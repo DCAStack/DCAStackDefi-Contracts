@@ -2,10 +2,13 @@
 
 pragma solidity ^0.8.9;
 
-import "./UserScheduleFactory.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+import "./UserBankData.sol";
+import "./UserScheduleData.sol";
 
 //contract executes User DCA Schedules
-contract UserScheduleTrade is UserScheduleFactory {
+contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
     address constant AGG_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
     uint256 MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;

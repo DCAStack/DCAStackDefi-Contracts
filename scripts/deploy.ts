@@ -13,16 +13,8 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
-
   const DCAStack = await ethers.getContractFactory("DCAStack");
-  const dcastack = await Greeter.deploy("Hello, DCAStack!");
+  const dcastack = await DCAStack.deploy();
 
   await dcastack.deployed();
 

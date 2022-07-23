@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { UserScheduleModifiers, IERC20 } from "../typechain";
+import { DCAStack, IERC20 } from "../typechain";
 import { ETH_ADDRESS, DAI_ADDRESS, DAI_CHECKSUM } from "./FaucetHelpers";
 import { BigNumber } from "ethers";
 
@@ -11,8 +11,8 @@ const tradeAmount = ethers.utils.parseEther("1");
 const tradeFreq = 1 * 86400; //trade daily
 
 describe("UserScheduleFactory Test Suite", function () {
-  let UserScheduleModifiers;
-  let hardhatUserScheduleModifiers: UserScheduleModifiers;
+  let DCAStack;
+  let hardhatUserScheduleModifiers: DCAStack;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
   let addr2: SignerWithAddress;
@@ -21,11 +21,11 @@ describe("UserScheduleFactory Test Suite", function () {
   let dai: IERC20;
 
   beforeEach(async function () {
-    UserScheduleModifiers = await ethers.getContractFactory(
-      "UserScheduleModifiers"
+    DCAStack = await ethers.getContractFactory(
+      "DCAStack"
     );
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-    hardhatUserScheduleModifiers = await UserScheduleModifiers.deploy();
+    hardhatUserScheduleModifiers = await DCAStack.deploy();
 
     let getSchedules = await hardhatUserScheduleModifiers
       .connect(addr1)

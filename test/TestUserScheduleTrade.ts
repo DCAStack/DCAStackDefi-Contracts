@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import { IERC20, UserScheduleTrade } from "../typechain";
+import { IERC20, DCAStack } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   ETH_ADDRESS,
@@ -31,8 +31,8 @@ const tradeFreq = 1 * 86400; // trade daily
 const endDate = Math.floor(new Date().getTime() / 1000) + 86400; //add 1 day
 
 describe("UserScheduleTrade Test Suite", function () {
-  let UserScheduleTrade;
-  let hhUserScheduleTrade: UserScheduleTrade;
+  let DCAStack;
+  let hhUserScheduleTrade: DCAStack;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
   let addr2: SignerWithAddress;
@@ -46,9 +46,9 @@ describe("UserScheduleTrade Test Suite", function () {
     DAI_IERC20 = await ethers.getContractAt("IERC20", DAI_ADDRESS);
     WETH_IERC20 = await ethers.getContractAt("IERC20", WETH_ADDRESS);
 
-    UserScheduleTrade = await ethers.getContractFactory("UserScheduleTrade");
+    DCAStack = await ethers.getContractFactory("DCAStack");
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-    hhUserScheduleTrade = await UserScheduleTrade.deploy();
+    hhUserScheduleTrade = await DCAStack.deploy();
 
     // get DAI for addr1
     await getTokenFromFaucet(

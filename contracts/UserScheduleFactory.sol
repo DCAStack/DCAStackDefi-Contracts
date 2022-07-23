@@ -2,14 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-
-import "./UserScheduleBank.sol";
+import "./UserBankData.sol";
+import "./UserScheduleData.sol";
 
 //create new user schedule and validate
-contract UserScheduleFactory is UserScheduleBank {
-    using EnumerableSet for EnumerableSet.AddressSet;
-
+contract UserScheduleFactory is UserBankData, UserScheduleData {
     event NewUserSchedule(
         uint256 indexed dcaScheduleId,
         address buyToken,
@@ -17,42 +14,20 @@ contract UserScheduleFactory is UserScheduleBank {
         address indexed dcaOwner
     );
 
-    struct DcaSchedule {
-        address dcaOwner;
-        uint256 tradeFrequency;
-        uint256 tradeAmount;
-        uint256 remainingBudget;
-        uint256 totalBudget;
-        address buyToken;
-        address sellToken;
-        bool isActive;
-        uint256 startDate;
-        uint256 lastRun;
-        uint256 nextRun;
-        uint256 endDate;
-    }
+    function deleteSchedule(uint256 _dcaScheduleId) external {
+        delete userToDcaSchedules[msg.sender][_dcaScheduleId];
+        userToDcaSchedules[msg.sender][_dcaScheduleId] = userToDcaSchedules[
+            msg.sender
+        ][userToDcaSchedules[msg.sender].length - 1];
+        userToDcaSchedules[msg.sender].pop();
 
-    mapping(address => DcaSchedule[]) public userToDcaSchedules;
-    EnumerableSet.AddressSet internal _userAddresses;
-
-    function getAllUsersSchedules()
-        external
-        view
-        returns (address[] memory, uint256[] memory)
-    {
-        uint256 length = _userAddresses.length();
-        address[] memory retrieveUsers = new address[](length);
-        uint256[] memory totalSchedules = new uint256[](length);
-
-        for (uint256 i; i < length; i++) {
-            retrieveUsers[i] = _userAddresses.at(i);
-            totalSchedules[i] = userToDcaSchedules[retrieveUsers[i]].length;
+        if (userToDcaSchedules[msg.sender].length == 0) {
+            removeUserFromSet();
         }
-        return (retrieveUsers, totalSchedules);
     }
 
-    function removeUserFromSet() internal {
-        _userAddresses.remove(msg.sender);
+    function changeStatus(uint256 _dcaScheduleId, bool _newStatus) external {
+        userToDcaSchedules[msg.sender][_dcaScheduleId].isActive = _newStatus;
     }
 
     function getUserSchedules() public view returns (DcaSchedule[] memory) {
@@ -175,7 +150,8 @@ contract UserScheduleFactory is UserScheduleBank {
             _endDate
         );
 
-        _userAddresses.add(msg.sender);
+        // _userAddresses.add(msg.sender);
+        addUser();
 
         userToDcaSchedules[msg.sender].push(
             DcaSchedule(
