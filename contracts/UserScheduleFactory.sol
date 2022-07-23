@@ -148,7 +148,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
             _endDate
         );
 
-        // _userAddresses.add(msg.sender);
         addUser();
 
         userToDcaSchedules[msg.sender].push(
