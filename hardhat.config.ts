@@ -8,6 +8,10 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers";
+
 
 dotenv.config();
 
@@ -27,12 +31,16 @@ import assert from "assert";
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
 assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
+const { DEPLOYER_PRIVATE_KEY } = process.env;
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+  paths: {
+    artifacts: "../DCAStackDefi-FrontEnd/src/artifacts",
+  },
   solidity: {
     version: "0.8.9",
     settings: {
@@ -40,10 +48,17 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 1000,
         details: {
-          yul: true
-        }
+          yul: true,
+          yulDetails: {
+            stackAllocation: true,
+          },
+        },
       },
-    }
+    },
+  },
+  namedAccounts: {
+    deployer: 0,
+    tokenOwner: 1,
   },
   contractSizer: {
     alphaSort: true,
@@ -54,7 +69,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       accounts: {
-        accountsBalance: "10000000000000000000000000000000000000000", // 1 billion ETH
+        accountsBalance: "100000000000000000000", //wei
       },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
