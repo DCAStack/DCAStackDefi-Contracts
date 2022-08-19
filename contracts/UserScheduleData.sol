@@ -13,14 +13,13 @@ contract UserScheduleData {
         uint256 tradeFrequency;
         uint256 tradeAmount;
         uint256 remainingBudget;
-        uint256 totalBudget;
         address buyToken;
         address sellToken;
         bool isActive;
-        uint256 startDate;
-        uint256 lastRun;
-        uint256 nextRun;
-        uint256 endDate;
+        uint256[4] scheduleDates; //startDate, lastRun, nextRun, endDate
+        uint256 soldAmount;
+        uint256 boughtAmount;
+        uint256 totalGas;
     }
 
     mapping(address => DcaSchedule[]) public userToDcaSchedules;

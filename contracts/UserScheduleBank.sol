@@ -11,18 +11,14 @@ import "./UserBankData.sol";
 contract UserScheduleBank is UserBankData, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    event FundsDeposited(
-        address indexed sender,
-        address indexed token,
-        uint256 indexed amount
-    );
+    event FundsDeposited(address indexed sender, address token, uint256 amount);
     event FundsWithdrawn(
         address indexed receiver,
-        address indexed token,
-        uint256 indexed amount
+        address token,
+        uint256 amount
     );
 
-    function depositGas() external payable {
+    function depositGas() public payable {
         uint256 depositAmount = msg.value;
         userGasBalances[msg.sender] =
             userGasBalances[msg.sender] +
@@ -30,6 +26,14 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
 
         addUserGasAddress(msg.sender);
         emit FundsDeposited(msg.sender, ETH, depositAmount);
+    }
+
+    receive() external payable {
+        depositGas();
+    }
+
+    fallback() external payable {
+        depositGas();
     }
 
     function withdrawGas(uint256 _tokenAmount) external nonReentrant {
@@ -41,7 +45,10 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
             userGasBalances[msg.sender] -
             _tokenAmount;
 
-        removeUserGasAddress(msg.sender);
+        (bool success, ) = msg.sender.call{value: _tokenAmount}("");
+        require(success, "_transfer: ETH transfer failed");
+
+        // removeUserGasAddress(msg.sender);
         emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
     }
 

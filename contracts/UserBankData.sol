@@ -18,6 +18,18 @@ contract UserBankData is Ownable {
     mapping(address => uint256) public userGasBalances;
     EnumerableSet.AddressSet internal _userGasAddresses;
 
+    function getUserTokensLength() internal view returns (uint256) {
+        return _userTokens[msg.sender].length();
+    }
+
+    function getUserTokenAddressAt(uint256 index)
+        internal
+        view
+        returns (address token)
+    {
+        return _userTokens[msg.sender].at(index);
+    }
+
     function removeUserToken(address _user, address _token) internal {
         if (userTokenBalances[_user][_token] == 0) {
             _userTokens[_user].remove(_token);
@@ -30,33 +42,15 @@ contract UserBankData is Ownable {
         }
     }
 
-    function getUserAllTokenBalances()
-        external
-        view
-        returns (address[] memory, uint256[] memory)
-    {
-        uint256 length = _userTokens[msg.sender].length();
-        address[] memory retrieveUserTokens = new address[](length);
-        uint256[] memory retrieveUserBalances = new uint256[](length);
-
-        for (uint256 i; i < length; i++) {
-            retrieveUserTokens[i] = _userTokens[msg.sender].at(i);
-            retrieveUserBalances[i] = userTokenBalances[msg.sender][
-                retrieveUserTokens[i]
-            ];
-        }
-        return (retrieveUserTokens, retrieveUserBalances);
-    }
-
     function addUserGasAddress(address _user) internal {
         _userGasAddresses.add(_user);
     }
 
-    function removeUserGasAddress(address _user) internal {
-        if (userGasBalances[_user] == 0) {
-            _userGasAddresses.remove(_user);
-        }
-    }
+    // function removeUserGasAddress(address _user) internal {
+    //     if (userGasBalances[_user] == 0) {
+    //         _userGasAddresses.remove(_user);
+    //     }
+    // }
 
     function getAllUsersGasBalances() public view returns (uint256) {
         uint256 length = _userGasAddresses.length();

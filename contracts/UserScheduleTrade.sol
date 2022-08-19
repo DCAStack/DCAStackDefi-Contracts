@@ -57,10 +57,11 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             0
         ) {
             userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
-            userToDcaSchedules[dcaOwner][scheduleId].nextRun = 0;
+            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
+            //startDate, lastRun, nextRun, endDate
         } else {
             //if still good, update next run
-            userToDcaSchedules[dcaOwner][scheduleId].nextRun =
+            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] =
                 currentDateTime +
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
         }
@@ -70,7 +71,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             dcaOwner,
             userToDcaSchedules[dcaOwner][scheduleId].sellToken
         );
-        removeUserGasAddress(dcaOwner);
+        // removeUserGasAddress(dcaOwner);
 
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][
@@ -81,8 +82,13 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             ] +
             boughtAmount;
 
-        //third, update schedule last run time
-        userToDcaSchedules[dcaOwner][scheduleId].lastRun = currentDateTime;
+        //third, update schedule details
+        userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[
+                1
+            ] = currentDateTime;
+        userToDcaSchedules[dcaOwner][scheduleId].soldAmount += soldAmount;
+        userToDcaSchedules[dcaOwner][scheduleId].boughtAmount += boughtAmount;
+        userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasUsed;
 
         //finally, update gas balance for user
         userGasBalances[dcaOwner] -= gasUsed;
@@ -101,7 +107,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                 u.isActive,
                 gasUsed,
                 remGas,
-                u.nextRun,
+                u.scheduleDates[2], //startDate, lastRun, nextRun, endDate
                 dcaOwner
             );
         }
@@ -123,7 +129,8 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
 
         //schedule not ready to execute
         require(
-            currentDateTime >= userToDcaSchedules[dcaOwner][scheduleId].nextRun,
+            currentDateTime >=
+                userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2], //startDate, lastRun, nextRun, endDate
             "Not Ready!"
         );
 
@@ -216,5 +223,5 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
     }
 
     // Payable fallback to allow this contract to receive protocol fee refunds.
-    receive() external payable {}
+    // receive() external payable {}
 }
