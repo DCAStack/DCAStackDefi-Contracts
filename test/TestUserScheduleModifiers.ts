@@ -4,13 +4,14 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { DCAStack, IERC20 } from "../typechain";
 import { ETH_ADDRESS, DAI_ADDRESS, DAI_CHECKSUM } from "./FaucetHelpers";
 import { BigNumber } from "ethers";
+import { parseEther } from "ethers/lib/utils";
 
 const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
 const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
-const tradeAmount = ethers.utils.parseEther("1");
+const tradeAmount = ethers.utils.parseEther("0.1");
 const tradeFreq = 1 * 86400; //trade daily
 
-describe("UserScheduleFactory Test Suite", function () {
+describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
   let DCAStack;
   let hardhatUserScheduleModifiers: DCAStack;
   let owner: SignerWithAddress;
@@ -34,12 +35,18 @@ describe("UserScheduleFactory Test Suite", function () {
 
     hardhatUserScheduleModifiers
       .connect(addr1)
-      .depositFunds(ETH_ADDRESS, ethers.utils.parseEther("7"), {
-        value: ethers.utils.parseEther("7"),
+      .depositFunds(ETH_ADDRESS, ethers.utils.parseEther("0.7"), {
+        value: ethers.utils.parseEther("0.7"),
       });
-    hardhatUserScheduleModifiers
+
+    await expect(hardhatUserScheduleModifiers
       .connect(addr1)
-      .depositGas({ value: ethers.utils.parseEther("1") });
+      .depositGas({ value: ethers.utils.parseEther("1") })).to.emit(hardhatUserScheduleModifiers, "FundsDeposited")
+      .withArgs(addr1.address, ETH_ADDRESS, ethers.utils.parseEther("1"));
+
+    expect(
+      await hardhatUserScheduleModifiers.userGasBalances(addr1.address)
+    ).to.equal(ethers.utils.parseEther("1"));
 
     await expect(
       hardhatUserScheduleModifiers
@@ -50,7 +57,7 @@ describe("UserScheduleFactory Test Suite", function () {
           DAI_ADDRESS,
           ETH_ADDRESS,
           startDate,
-          endDate
+          endDate, parseEther("0.0000001")
         )
     )
       .to.emit(hardhatUserScheduleModifiers, "NewUserSchedule")
@@ -60,6 +67,7 @@ describe("UserScheduleFactory Test Suite", function () {
       .connect(addr1)
       .getUserSchedules();
     expect(getSchedules.length).to.equal(1);
+
   });
 
   describe("Schedule Modifier Pause", function () {
@@ -71,7 +79,7 @@ describe("UserScheduleFactory Test Suite", function () {
 
       expect(getSchedules[0].isActive).to.eq(true);
 
-      await hardhatUserScheduleModifiers.connect(addr1).changeStatus(0, false);
+      await hardhatUserScheduleModifiers.connect(addr1).pauseSchedule(0);
 
       getSchedules = await hardhatUserScheduleModifiers
         .connect(addr1)
@@ -91,7 +99,7 @@ describe("UserScheduleFactory Test Suite", function () {
 
       //change non existent schedule id
       await expect(
-        hardhatUserScheduleModifiers.connect(addr1).changeStatus(2, false)
+        hardhatUserScheduleModifiers.connect(addr1).pauseSchedule(2)
       ).to.be.reverted;
     });
 
@@ -104,7 +112,7 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].isActive).to.eq(true);
 
       await expect(
-        hardhatUserScheduleModifiers.connect(addr3).changeStatus(0, false)
+        hardhatUserScheduleModifiers.connect(addr3).pauseSchedule(0)
       ).to.be.reverted;
     });
   });
@@ -155,7 +163,7 @@ describe("UserScheduleFactory Test Suite", function () {
               DAI_ADDRESS,
               ETH_ADDRESS,
               startDate,
-              endDate
+              endDate, BigNumber.from(1)
             )
         )
           .to.emit(hardhatUserScheduleModifiers, "NewUserSchedule")

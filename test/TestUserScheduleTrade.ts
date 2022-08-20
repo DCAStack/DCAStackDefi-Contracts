@@ -10,6 +10,7 @@ import {
   DAI_CHECKSUM,
   WETH_CHECKSUM
 } from "./FaucetHelpers";
+import { BigNumber } from "ethers";
 
 // Agg calldata for transfering 100 DAI to WETH
 const daiToWethCallData =
@@ -83,7 +84,8 @@ describe("UserScheduleTrade Test Suite", function () {
         DAI_ADDRESS,
         ETH_ADDRESS,
         startDate,
-        endDate
+        endDate,
+        BigNumber.from(1)
       );
 
     // DAI to buy WETH schedule 1
@@ -104,7 +106,8 @@ describe("UserScheduleTrade Test Suite", function () {
         WETH_ADDRESS,
         DAI_ADDRESS,
         startDate,
-        endDate
+        endDate,
+        BigNumber.from(1)
       );
 
     // DAI to buy ETH schedule 2
@@ -120,7 +123,8 @@ describe("UserScheduleTrade Test Suite", function () {
         ETH_ADDRESS,
         DAI_ADDRESS,
         startDate,
-        endDate
+        endDate,
+        BigNumber.from(1)
       );
   });
 
@@ -221,7 +225,8 @@ describe("UserScheduleTrade Test Suite", function () {
           DAI_ADDRESS,
           ETH_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       const initialEthBalance = await hhUserScheduleTrade.userTokenBalances(
@@ -383,7 +388,8 @@ describe("UserScheduleTrade Test Suite", function () {
           WETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       const initialWethBalance = await hhUserScheduleTrade.userTokenBalances(
@@ -547,7 +553,8 @@ describe("UserScheduleTrade Test Suite", function () {
           ETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       const initialEthBalance = await hhUserScheduleTrade.userTokenBalances(
@@ -640,7 +647,8 @@ describe("UserScheduleTrade Test Suite", function () {
           ETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       await expect(
@@ -677,7 +685,8 @@ describe("UserScheduleTrade Test Suite", function () {
           ETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       await hhUserScheduleTrade
@@ -724,7 +733,8 @@ describe("UserScheduleTrade Test Suite", function () {
           ETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       await expect(
@@ -773,7 +783,8 @@ describe("UserScheduleTrade Test Suite", function () {
           ETH_ADDRESS,
           DAI_ADDRESS,
           startDate,
-          endDate
+          endDate,
+          BigNumber.from(1)
         );
 
       await expect(

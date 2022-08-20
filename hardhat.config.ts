@@ -69,7 +69,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       accounts: {
-        accountsBalance: "100000000000000000000", //wei
+        accountsBalance: "1000000000000000000000000", //wei
       },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,

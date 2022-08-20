@@ -462,7 +462,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -481,7 +482,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -497,7 +499,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.not.be.reverted;
     });
@@ -529,7 +532,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -546,7 +550,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -562,7 +567,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.not.be.reverted;
     });
@@ -582,7 +588,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             tradeFreq,
             endDate,
-            startDate
+            startDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -590,7 +597,7 @@ describe("UserScheduleFactory Test Suite", function () {
       await expect(
         hardhatUserScheduleFactory
           .connect(addr1)
-          .validateDcaSchedule(ETH_ADDRESS, -1, tradeFreq, startDate, endDate)
+          .validateDcaSchedule(ETH_ADDRESS, -1, tradeFreq, startDate, endDate, BigNumber.from(1))
       ).to.be.reverted;
 
       //invalid tradeFreq
@@ -602,7 +609,8 @@ describe("UserScheduleFactory Test Suite", function () {
             tradeAmount,
             100000000000,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
     });
@@ -630,7 +638,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -650,7 +659,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -667,7 +677,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -688,10 +699,10 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].buyToken).to.eq(DAI_CHECKSUM);
       expect(getSchedules[0].sellToken).to.eq(ETH_ADDRESS);
       expect(getSchedules[0].isActive).to.eq(true);
-      expect(getSchedules[0].startDate).to.eq(startDate);
-      expect(getSchedules[0].lastRun).to.eq(0);
-      expect(getSchedules[0].nextRun).to.eq(startDate);
-      expect(getSchedules[0].endDate).to.eq(endDate);
+      expect(getSchedules[0].scheduleDates[0]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[1]).to.eq(0);
+      expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
     });
 
     it("Should create daily DCA schedule for ETH_ADDRESS/DAI_ADDRESS", async function () {
@@ -727,7 +738,8 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             DAI_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -745,7 +757,8 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             DAI_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -762,7 +775,8 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             DAI_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -783,10 +797,10 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].buyToken).to.eq(ETH_ADDRESS);
       expect(getSchedules[0].sellToken).to.eq(DAI_CHECKSUM);
       expect(getSchedules[0].isActive).to.eq(true);
-      expect(getSchedules[0].startDate).to.eq(startDate);
-      expect(getSchedules[0].lastRun).to.eq(0);
-      expect(getSchedules[0].nextRun).to.eq(startDate);
-      expect(getSchedules[0].endDate).to.eq(endDate);
+      expect(getSchedules[0].scheduleDates[0]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[1]).to.eq(0);
+      expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
     });
 
     it("Should create multiasset schedules", async function () {
@@ -828,7 +842,8 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             DAI_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -849,10 +864,10 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].buyToken).to.eq(ETH_ADDRESS);
       expect(getSchedules[0].sellToken).to.eq(DAI_CHECKSUM);
       expect(getSchedules[0].isActive).to.eq(true);
-      expect(getSchedules[0].startDate).to.eq(startDate);
-      expect(getSchedules[0].lastRun).to.eq(0);
-      expect(getSchedules[0].nextRun).to.eq(startDate);
-      expect(getSchedules[0].endDate).to.eq(endDate);
+      expect(getSchedules[0].scheduleDates[0]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[1]).to.eq(0);
+      expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
+      expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
 
       hardhatUserScheduleFactory
         .connect(addr1)
@@ -872,7 +887,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -893,10 +909,10 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[1].buyToken).to.eq(DAI_CHECKSUM);
       expect(getSchedules[1].sellToken).to.eq(ETH_ADDRESS);
       expect(getSchedules[1].isActive).to.eq(true);
-      expect(getSchedules[1].startDate).to.eq(startDate);
-      expect(getSchedules[1].lastRun).to.eq(0);
-      expect(getSchedules[1].nextRun).to.eq(startDate);
-      expect(getSchedules[1].endDate).to.eq(endDate);
+      expect(getSchedules[1].scheduleDates[0]).to.eq(startDate);
+      expect(getSchedules[1].scheduleDates[1]).to.eq(0);
+      expect(getSchedules[1].scheduleDates[2]).to.eq(startDate);
+      expect(getSchedules[1].scheduleDates[3]).to.eq(endDate);
     });
 
     it("Should create schedule invalid", async function () {
@@ -915,7 +931,8 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             DAI_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -936,6 +953,7 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             endDate,
             startDate
+            , BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -950,6 +968,7 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             endDate,
             startDate
+            , BigNumber.from(1)
           )
       ).to.be.reverted;
 
@@ -964,6 +983,7 @@ describe("UserScheduleFactory Test Suite", function () {
             ETH_ADDRESS,
             endDate,
             startDate
+            , BigNumber.from(1)
           )
       ).to.be.reverted;
     });
@@ -1000,7 +1020,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -1031,7 +1052,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
@@ -1062,7 +1084,8 @@ describe("UserScheduleFactory Test Suite", function () {
             DAI_ADDRESS,
             ETH_ADDRESS,
             startDate,
-            endDate
+            endDate,
+            BigNumber.from(1)
           )
       )
         .to.emit(hardhatUserScheduleFactory, "NewUserSchedule")
