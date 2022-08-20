@@ -46,12 +46,6 @@ contract UserBankData is Ownable {
         _userGasAddresses.add(_user);
     }
 
-    // function removeUserGasAddress(address _user) internal {
-    //     if (userGasBalances[_user] == 0) {
-    //         _userGasAddresses.remove(_user);
-    //     }
-    // }
-
     function getAllUsersGasBalances() public view returns (uint256) {
         uint256 length = _userGasAddresses.length();
         uint256 totalGas;

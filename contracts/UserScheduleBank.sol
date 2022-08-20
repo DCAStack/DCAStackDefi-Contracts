@@ -48,7 +48,6 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
         (bool success, ) = msg.sender.call{value: _tokenAmount}("");
         require(success, "_transfer: ETH transfer failed");
 
-        // removeUserGasAddress(msg.sender);
         emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
     }
 

@@ -236,6 +236,4 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         );
     }
 
-    // Payable fallback to allow this contract to receive protocol fee refunds.
-    // receive() external payable {}
 }
