@@ -269,4 +269,85 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
       expect(getSchedules.length).to.equal(1);
     });
   });
+
+  describe("Schedule Modifier Resume", function () {
+    it("Should resume schedule", async function () {
+      let getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(true);
+
+      await hardhatUserScheduleModifiers.connect(addr1).pauseSchedule(0);
+
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(false);
+
+      await hardhatUserScheduleModifiers.connect(addr1).resumeSchedule(0, parseEther("0.01"));
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+      expect(getSchedules[0].isActive).to.eq(true);
+
+    });
+
+    it("Should NOT resume schedule due to low gas", async function () {
+      let getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(true);
+
+      await hardhatUserScheduleModifiers.connect(addr1).pauseSchedule(0);
+
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(false);
+
+      await expect(hardhatUserScheduleModifiers.connect(addr1).resumeSchedule(0, parseEther("100"))).to.be.reverted;
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+      expect(getSchedules[0].isActive).to.eq(false);
+    });
+
+    it("Should NOT resume schedule due to low bal", async function () {
+      let getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(true);
+
+      await hardhatUserScheduleModifiers.connect(addr1).pauseSchedule(0);
+
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+
+      expect(getSchedules[0].isActive).to.eq(false);
+
+      await hardhatUserScheduleModifiers.connect(addr1).withdrawFunds(ETH_ADDRESS, parseEther("0.7"));
+      await expect(hardhatUserScheduleModifiers.connect(addr1).resumeSchedule(0, parseEther("0.01"))).to.be.reverted;
+      getSchedules = await hardhatUserScheduleModifiers
+        .connect(addr1)
+        .getUserSchedules();
+      expect(getSchedules.length).to.equal(1);
+      expect(getSchedules[0].isActive).to.eq(false);
+    });
+
+  });
+
 });
