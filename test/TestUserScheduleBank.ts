@@ -111,7 +111,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       await expect(
         hardhatUserScheduleBank
@@ -130,7 +130,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [withdrawAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [withdrawAmount], [withdrawAmount]]);
     });
 
     it("Should deposit/withdraw all ETH into contract by addr1", async function () {
@@ -154,7 +154,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       await expect(
         hardhatUserScheduleBank
@@ -173,7 +173,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
 
     it("Should deposit/withdraw DAI into contract by addr1", async function () {
@@ -202,7 +202,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       await expect(
         hardhatUserScheduleBank
@@ -246,7 +246,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       await expect(
         hardhatUserScheduleBank
@@ -265,7 +265,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
   });
 
@@ -297,7 +297,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       //ETH_ADDRESS deposit
       await expect(
@@ -320,6 +320,7 @@ describe("UserScheduleBank Test Suite", function () {
       ).to.deep.equal([
         [DAI_CHECKSUM, ETH_ADDRESS],
         [depositAmount, depositAmount],
+        [depositAmount, depositAmount],
       ]);
 
       //withdraw all DAI_ADDRESS
@@ -340,7 +341,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       //withdraw all ETH_ADDRESS
       await expect(
@@ -360,7 +361,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
   });
 
@@ -387,7 +388,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       //addr2 check balances
       expect(
@@ -399,7 +400,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
 
     it("Should deposit DAI into contract by addr1 but not accessible by addr2", async function () {
@@ -428,7 +429,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       await expect(
         hardhatUserScheduleBank
@@ -455,7 +456,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
   });
 
@@ -482,7 +483,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       //addr2 withdraws more than it has
       await expect(
@@ -502,7 +503,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
     });
 
     it("Should not let addr2 withdraw more DAI than balance by itself", async function () {
@@ -531,7 +532,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       //addr2 withdraws more than it has
       await expect(
@@ -551,7 +552,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
     });
 
     it("Should not let addr2 withdraw more ETH than balance with addr1 funds", async function () {
@@ -576,7 +577,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount]]);
+      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
 
       //addr2 attempts withdrawal
       await expect(
@@ -596,7 +597,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
 
     it("Should not let addr2 withdraw more DAI than balance with addr1 funds", async function () {
@@ -625,7 +626,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM], [depositAmount], [depositAmount]]);
 
       //addr2 attempts withdrawal
       await expect(
@@ -645,7 +646,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr2).getUserAllTokenBalances()
-      ).to.deep.equal([[], []]);
+      ).to.deep.equal([[], [], []]);
     });
   });
 });

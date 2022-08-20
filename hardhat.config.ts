@@ -6,11 +6,11 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import "@openzeppelin/hardhat-upgrades";
+// import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
-import "@nomiclabs/hardhat-ethers";
-import "hardhat-deploy";
-import "hardhat-deploy-ethers";
+// import "@nomiclabs/hardhat-ethers";
+// import "hardhat-deploy";
+// import "hardhat-deploy-ethers";
 
 
 dotenv.config();
@@ -56,10 +56,10 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  namedAccounts: {
-    deployer: 0,
-    tokenOwner: 1,
-  },
+  // namedAccounts: {
+  //   deployer: 0,
+  //   tokenOwner: 1,
+  // },
   contractSizer: {
     alphaSort: true,
     disambiguatePaths: false,
