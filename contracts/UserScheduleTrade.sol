@@ -48,6 +48,9 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             ] -
             soldAmount;
 
+        //update last run
+        userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[1] = userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2];
+
         //if rem budget or user bal is empty, schedule gets paused
         if (
             userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0 ||
@@ -60,10 +63,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             // userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
             //startDate, lastRun, nextRun, endDate
         } else {
-            //if still good, update next run
-            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] =
-                currentDateTime +
-                userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
 
             //update end date if needed
             uint256 numExec = calculateExecutions(
@@ -72,6 +71,12 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                 userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] //endDate
             );
 
+            //if still good, update next run
+            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] =
+                currentDateTime +
+                userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
+
+            //update end date based on when last ran
             userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] = currentDateTime + (userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency*numExec);
         }
 
@@ -132,6 +137,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         uint256 currentDateTime,
         bytes memory swapCallData
     ) external payable onlyOwner {
+
         //not enough gas check
         require(userGasBalances[dcaOwner] > currentGasPrice, "Low Gas!");
 

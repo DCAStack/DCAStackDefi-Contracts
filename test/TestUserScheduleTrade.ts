@@ -11,6 +11,7 @@ import {
   WETH_CHECKSUM
 } from "./FaucetHelpers";
 import { BigNumber } from "ethers";
+import { parseEther } from "ethers/lib/utils";
 
 // Agg calldata for transfering 100 DAI to WETH
 const daiToWethCallData =
@@ -128,6 +129,7 @@ describe("UserScheduleTrade Test Suite", function () {
       );
   });
 
+  //TODO
   describe("Update User DCA Details", function () {
 
     it("Should update after swap sold less than amount", async function () { });
@@ -200,12 +202,27 @@ describe("UserScheduleTrade Test Suite", function () {
           false,
           1,
           finalGasBalance,
-          0,
+          startDate,
           addr1.address
         );
+
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let EthToDaiSchedule = userSchedules[0];
+      expect(EthToDaiSchedule.remainingBudget).to.equal(0);
+      expect(EthToDaiSchedule.isActive).to.equal(false);
+      expect(EthToDaiSchedule.scheduleDates[0]).to.equal(startDate);
+      expect(EthToDaiSchedule.scheduleDates[1]).to.equal(startDate);
+      expect(EthToDaiSchedule.scheduleDates[2]).to.equal(startDate);
+      expect(EthToDaiSchedule.scheduleDates[3]).to.equal(endDate);
+      expect(EthToDaiSchedule.soldAmount).to.equal(ethBalDiff);
+      expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
+      expect(EthToDaiSchedule.totalGas).to.equal(BigNumber.from(1));
+
     });
 
-    it("Should swap ETH to DAI multi run pending", async function () {
+    //TODO add extra params
+    it("Should swap ETH to DAI multiple trades pending", async function () {
 
       const tradeAmount = ethers.utils.parseEther("100");
       const depositAmount = ethers.utils.parseEther("200");
@@ -289,15 +306,31 @@ describe("UserScheduleTrade Test Suite", function () {
           true,
           1,
           finalGasBalance,
-          currentDateTime + tradeFreq,
+          startDate + tradeFreq,
           addr1.address
         );
+
+
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let EthToDaiSchedule = userSchedules[scheduleNum];
+      expect(EthToDaiSchedule.remainingBudget).to.equal(ethers.utils.parseEther("100"));
+      expect(EthToDaiSchedule.isActive).to.equal(true);
+      expect(EthToDaiSchedule.scheduleDates[0]).to.equal(startDate);
+      expect(EthToDaiSchedule.scheduleDates[1]).to.equal(startDate);
+      expect(EthToDaiSchedule.scheduleDates[2]).to.equal(startDate + tradeFreq);
+      expect(EthToDaiSchedule.scheduleDates[3]).to.equal(endDate);
+      expect(EthToDaiSchedule.soldAmount).to.equal(ethBalDiff);
+      expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
+      expect(EthToDaiSchedule.totalGas).to.equal(BigNumber.from(1));
+
     });
 
 
   });
 
   describe("Swap token to Token", function () {
+
     it("Should swap DAI to WETH single run", async function () {
       const initialWethBalance = await hhUserScheduleTrade.userTokenBalances(
         addr1.address,
@@ -363,10 +396,25 @@ describe("UserScheduleTrade Test Suite", function () {
           false,
           1,
           finalGasBalance,
-          0,
+          startDate,
           addr1.address
         );
+
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let DaiToWeth = userSchedules[1];
+      expect(DaiToWeth.remainingBudget).to.equal(0);
+      expect(DaiToWeth.isActive).to.equal(false);
+      expect(DaiToWeth.scheduleDates[0]).to.equal(startDate);
+      expect(DaiToWeth.scheduleDates[1]).to.equal(startDate);
+      expect(DaiToWeth.scheduleDates[2]).to.equal(startDate);
+      expect(DaiToWeth.scheduleDates[3]).to.equal(endDate);
+      expect(DaiToWeth.soldAmount).to.equal(daiBalDiff);
+      expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
+      expect(DaiToWeth.totalGas).to.equal(BigNumber.from(1));
+
     });
+
 
     it("Should swap DAI to WETH multi run pending", async function () {
 
@@ -459,6 +507,20 @@ describe("UserScheduleTrade Test Suite", function () {
           currentDateTime + tradeFreq,
           addr1.address
         );
+
+
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let DaiToWeth = userSchedules[scheduleNum];
+      expect(DaiToWeth.remainingBudget).to.equal(ethers.utils.parseEther("100"));
+      expect(DaiToWeth.isActive).to.equal(true);
+      expect(DaiToWeth.scheduleDates[0]).to.equal(startDate);
+      expect(DaiToWeth.scheduleDates[1]).to.equal(startDate);
+      expect(DaiToWeth.scheduleDates[2]).to.equal(startDate + tradeFreq);
+      expect(DaiToWeth.scheduleDates[3]).to.equal(endDate);
+      expect(DaiToWeth.soldAmount).to.equal(daiBalDiff);
+      expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
+      expect(DaiToWeth.totalGas).to.equal(BigNumber.from(1));
     });
 
   });
@@ -526,11 +588,22 @@ describe("UserScheduleTrade Test Suite", function () {
           false,
           1,
           finalGasBalance,
-          0,
+          startDate,
           addr1.address
         );
 
-
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.remainingBudget).to.equal(0);
+      expect(DaiToEth.isActive).to.equal(false);
+      expect(DaiToEth.scheduleDates[0]).to.equal(startDate);
+      expect(DaiToEth.scheduleDates[1]).to.equal(startDate);
+      expect(DaiToEth.scheduleDates[2]).to.equal(startDate);
+      expect(DaiToEth.scheduleDates[3]).to.equal(endDate);
+      expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
+      expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
+      expect(DaiToEth.totalGas).to.equal(BigNumber.from(1));
     });
 
     it("Should swap DAI to ETH multi run pending", async function () {
@@ -618,10 +691,173 @@ describe("UserScheduleTrade Test Suite", function () {
           addr1.address
         );
 
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.remainingBudget).to.equal(ethers.utils.parseEther("100"));
+      expect(DaiToEth.isActive).to.equal(true);
+      expect(DaiToEth.scheduleDates[0]).to.equal(startDate);
+      expect(DaiToEth.scheduleDates[1]).to.equal(startDate);
+      expect(DaiToEth.scheduleDates[2]).to.equal(startDate + tradeFreq);
+      expect(DaiToEth.scheduleDates[3]).to.equal(endDate);
+      expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
+      expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
+      expect(DaiToEth.totalGas).to.equal(BigNumber.from(1));
 
     });
 
   });
+
+
+  describe("Swap after user resumes schedule", function () {
+
+    it("Should swap DAI to ETH multi run pending after resume", async function () {
+
+      const tradeAmount = ethers.utils.parseEther("100");
+      const depositAmount = ethers.utils.parseEther("300");
+      const startDateTest = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
+      const endDateTest = startDateTest + (86400 * 3); //add 2 days
+      const scheduleNum = 3; //since we're adding 4th schedule
+
+      await hhUserScheduleTrade
+        .connect(addr1)
+        .depositFunds(DAI_ADDRESS, depositAmount);
+
+      //4th schedule
+      await hhUserScheduleTrade
+        .connect(addr1)
+        .createDcaSchedule(
+          tradeFreq,
+          tradeAmount,
+          ETH_ADDRESS,
+          DAI_ADDRESS,
+          startDateTest,
+          endDateTest,
+          BigNumber.from(1)
+        );
+
+      const initialEthBalance = await hhUserScheduleTrade.userTokenBalances(
+        addr1.address,
+        ETH_ADDRESS
+      );
+      const initialDaiBalance = await hhUserScheduleTrade.userTokenBalances(
+        addr1.address,
+        DAI_ADDRESS
+      );
+      const initialContractDaiBalance = await DAI_IERC20.balanceOf(
+        hhUserScheduleTrade.address
+      );
+      const initialGasBalance = await hhUserScheduleTrade.userGasBalances(
+        addr1.address
+      );
+
+      const tx = await hhUserScheduleTrade.runUserDCA(
+        addr1.address,
+        scheduleNum,
+        1,
+        startDateTest,
+        daiToEthCallData
+      );
+
+      const finalEthBalance = await hhUserScheduleTrade.userTokenBalances(
+        addr1.address,
+        ETH_ADDRESS
+      );
+      const finalDaiBalance = await hhUserScheduleTrade.userTokenBalances(
+        addr1.address,
+        DAI_ADDRESS
+      );
+      const finalDaiContractBalance = await DAI_IERC20.balanceOf(
+        hhUserScheduleTrade.address
+      );
+      const finalGasBalance = await hhUserScheduleTrade.userGasBalances(
+        addr1.address
+      );
+
+      expect(initialDaiBalance).gt(finalDaiBalance);
+      expect(finalEthBalance).gt(initialEthBalance);
+      expect(initialContractDaiBalance).gt(finalDaiContractBalance);
+      expect(initialGasBalance).gt(finalGasBalance);
+
+      const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
+      const ethBalDiff = finalEthBalance.sub(initialEthBalance)
+
+      await expect(tx).to.emit(hhUserScheduleTrade, "BoughtTokens")
+        .withArgs(
+          scheduleNum,
+          DAI_CHECKSUM,
+          ETH_ADDRESS,
+          daiBalDiff,
+          ethBalDiff,
+          ethers.utils.parseEther("200"),
+          true,
+          1,
+          finalGasBalance,
+          startDateTest + tradeFreq,
+          addr1.address
+        );
+
+      let userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      let DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.remainingBudget).to.equal(ethers.utils.parseEther("200"));
+      expect(DaiToEth.isActive).to.equal(true);
+      expect(DaiToEth.scheduleDates[0]).to.equal(startDateTest);
+      expect(DaiToEth.scheduleDates[1]).to.equal(startDateTest);
+      expect(DaiToEth.scheduleDates[2]).to.equal(startDateTest + tradeFreq);
+      expect(DaiToEth.scheduleDates[3]).to.equal(endDateTest);
+      expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
+      expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
+      expect(DaiToEth.totalGas).to.equal(BigNumber.from(1));
+
+      hhUserScheduleTrade
+        .connect(addr1).pauseSchedule(scheduleNum);
+
+      userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.isActive).to.equal(false);
+
+      await expect(hhUserScheduleTrade.runUserDCA(
+        addr1.address,
+        scheduleNum,
+        1,
+        currentDateTime,
+        daiToEthCallData
+      )).to.be.reverted;
+
+      hhUserScheduleTrade
+        .connect(addr1).resumeSchedule(scheduleNum, 1);
+
+      userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.isActive).to.equal(true);
+
+      await hhUserScheduleTrade.runUserDCA(
+        addr1.address,
+        scheduleNum,
+        1,
+        currentDateTime,
+        daiToEthCallData
+      );
+
+      userSchedules = await hhUserScheduleTrade
+        .connect(addr1).getUserSchedules();
+      DaiToEth = userSchedules[scheduleNum];
+      expect(DaiToEth.isActive).to.equal(true);
+      expect(DaiToEth.scheduleDates[0]).to.equal(startDateTest);
+      expect(DaiToEth.scheduleDates[1]).to.equal(currentDateTime);
+      expect(DaiToEth.scheduleDates[2]).to.equal(currentDateTime + tradeFreq);
+      expect(DaiToEth.scheduleDates[3]).to.equal(currentDateTime + (tradeFreq * 2));
+      expect(DaiToEth.soldAmount).to.equal(parseEther("200"));
+      // expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
+      expect(DaiToEth.totalGas).to.equal(BigNumber.from(2));
+
+    });
+
+  });
+
 
   describe("Swap invalid scenarios", function () {
 
@@ -702,11 +938,6 @@ describe("UserScheduleTrade Test Suite", function () {
           daiToEthCallData
         )
       ).to.be.reverted;
-
-    });
-
-    it("Should not swap due to low schedule budget", async function () {
-
 
     });
 
