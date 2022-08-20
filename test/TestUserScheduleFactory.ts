@@ -28,8 +28,291 @@ describe("UserScheduleFactory Test Suite", function () {
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI_ADDRESS);
   });
 
+  describe("Schedule Helper Free Gas Balances", function () {
+    it("Should calculate free gas balance no schedules", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+    });
+
+    it("Should calculate free gas balance with active schedule", async function () {
+
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(ethers.utils.parseEther("0.01"));
+      expect(userDepositedBal).to.eq(depositAmount.sub(ethers.utils.parseEther("0.07")));
+
+    });
+
+    it("Should calculate free gas balance with paused schedule", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      hardhatUserScheduleFactory
+        .connect(addr1).pauseSchedule(0);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(ethers.utils.parseEther("0.01"));
+      expect(userDepositedBal).to.eq(depositAmount);
+
+    });
+
+    it("Should calculate free gas balance negative case", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(0);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      hardhatUserScheduleFactory
+        .connect(addr1).withdrawGas(depositAmount);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeGasBalance(ethers.utils.parseEther("0.01"));
+      expect(userDepositedBal).to.eq(ethers.utils.parseEther("-0.07"));
+    });
+
+  });
+
   describe("Schedule Helper Free Token Balances", function () {
-    it("Should calculate free token balance ETH_ADDRESS", async function () {
+
+    it("Should calculate free token balance ETH with active schedule", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount.sub(ethers.utils.parseEther("0.07")));
+    });
+
+    it("Should calculate free token balance ETH with paused schedule", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      hardhatUserScheduleFactory
+        .connect(addr1).pauseSchedule(0);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+    });
+
+    it("Should calculate free token balance ETH negative case", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(ETH_ADDRESS, depositAmount, { value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            DAI_ADDRESS,
+            ETH_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+      hardhatUserScheduleFactory
+        .connect(addr1).withdrawFunds(ETH_ADDRESS, depositAmount);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(ETH_ADDRESS);
+      expect(userDepositedBal).to.eq(ethers.utils.parseEther("-0.07"));
+    });
+
+    it("Should calculate free token balance ETH no schedules", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
 
       let userDepositedBal = await hardhatUserScheduleFactory
@@ -53,7 +336,151 @@ describe("UserScheduleFactory Test Suite", function () {
       ).to.eq(0);
     });
 
-    it("Should calculate free token balance DAI_ADDRESS", async function () {
+    it("Should calculate free token balance DAI with active schedule", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
+      await dai
+        .connect(addr1)
+        .approve(hardhatUserScheduleFactory.address, depositAmount);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(DAI_ADDRESS, depositAmount);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            ETH_ADDRESS,
+            DAI_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount.sub(ethers.utils.parseEther("0.07")));
+    });
+
+    it("Should calculate free token balance DAI with paused schedule", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
+      await dai
+        .connect(addr1)
+        .approve(hardhatUserScheduleFactory.address, depositAmount);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(DAI_ADDRESS, depositAmount);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            ETH_ADDRESS,
+            DAI_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      hardhatUserScheduleFactory
+        .connect(addr1).pauseSchedule(0);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+    });
+
+    it("Should calculate free token balance DAI negative case", async function () {
+      const depositAmount: BigNumber = ethers.utils.parseEther("1");
+
+      let userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(0);
+
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
+      await dai
+        .connect(addr1)
+        .approve(hardhatUserScheduleFactory.address, depositAmount);
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositFunds(DAI_ADDRESS, depositAmount, { value: depositAmount });
+
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({ value: depositAmount });
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(depositAmount);
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .createDcaSchedule(
+            86400,
+            ethers.utils.parseEther("0.01"),
+            ETH_ADDRESS,
+            DAI_ADDRESS,
+            new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
+            new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
+            ethers.utils.parseEther("0.01")
+          )
+      ).to.not.be.reverted;
+
+      hardhatUserScheduleFactory
+        .connect(addr1).withdrawFunds(DAI_ADDRESS, depositAmount);
+
+      userDepositedBal = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .getFreeTokenBalance(DAI_ADDRESS);
+      expect(userDepositedBal).to.eq(ethers.utils.parseEther("-0.07"));
+    });
+
+    it("Should calculate free token balance DAI no schedules", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
       await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
       await dai
@@ -279,8 +706,98 @@ describe("UserScheduleFactory Test Suite", function () {
     });
   });
 
+  describe("Schedule Helper Calculate Gas Deposit", function () {
+
+    it("Should calculate gas deposit for schedule", async function () {
+      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
+      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
+      const tradeFreq = 1 * 86400;
+      const tradeAmount = ethers.utils.parseEther("1");
+
+      //no balance
+      let neededDeposit = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .calculateGasDeposit(
+          tradeAmount,
+          tradeFreq,
+          startDate,
+          endDate,
+        );
+      expect(neededDeposit).to.eq(ethers.utils.parseEther("7"));
+
+      //deposit 1 ETH_ADDRESS
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({
+          value: ethers.utils.parseEther("1"),
+        });
+      neededDeposit = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .calculateGasDeposit(
+          tradeAmount,
+          tradeFreq,
+          startDate,
+          endDate,
+        );
+      expect(neededDeposit).to.eq(ethers.utils.parseEther("6"));
+
+      //deposit 6 ETH_ADDRESS
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({
+          value: ethers.utils.parseEther("6"),
+        });
+      neededDeposit = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .calculateGasDeposit(
+          tradeAmount,
+          tradeFreq,
+          startDate,
+          endDate,
+        );
+      expect(neededDeposit).to.eq(0);
+
+      //deposit 1 more ETH_ADDRESS more than needed
+      hardhatUserScheduleFactory
+        .connect(addr1)
+        .depositGas({
+          value: ethers.utils.parseEther("1"),
+        });
+      neededDeposit = await hardhatUserScheduleFactory
+        .connect(addr1)
+        .calculateGasDeposit(
+          tradeAmount,
+          tradeFreq,
+          startDate,
+          endDate,
+        );
+      expect(neededDeposit).to.eq(0);
+    });
+
+    it("Should calculate gas deposit invalid trade amount", async function () {
+      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
+      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
+      const tradeFreq = 1 * 86400;
+      const tradeAmount = 0;
+
+      await expect(
+        hardhatUserScheduleFactory
+          .connect(addr1)
+          .calculateGasDeposit(
+            tradeAmount,
+            tradeFreq,
+            startDate,
+            endDate,
+          )
+      ).to.be.reverted;
+    });
+
+
+  });
+
   describe("Schedule Helper Calculate Deposit", function () {
-    it("Should calculate deposit for DAI_ADDRESS", async function () {
+
+    it("Should calculate deposit for DAI", async function () {
       await getTokenFromFaucet(
         DAI_ADDRESS,
         addr1.address,
@@ -356,7 +873,7 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(neededDeposit).to.eq(0);
     });
 
-    it("Should calculate deposit for ETH_ADDRESS", async function () {
+    it("Should calculate deposit for ETH", async function () {
       const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
       const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
       const tradeFreq = 1 * 86400;
@@ -705,7 +1222,7 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
     });
 
-    it("Should create daily DCA schedule for ETH_ADDRESS/DAI_ADDRESS", async function () {
+    it("Should create daily DCA schedule for ETH/DAI_ADDRESS", async function () {
       await getTokenFromFaucet(
         DAI_ADDRESS,
         addr1.address,
