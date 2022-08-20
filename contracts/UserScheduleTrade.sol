@@ -57,13 +57,22 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             0
         ) {
             userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
-            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
+            // userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
             //startDate, lastRun, nextRun, endDate
         } else {
             //if still good, update next run
             userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] =
                 currentDateTime +
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
+
+            //update end date if needed
+            uint256 numExec = calculateExecutions(
+                userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency,
+                userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2], //nextRun
+                userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] //endDate
+            );
+
+            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] = currentDateTime + (userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency*numExec);
         }
 
         //remove tokens from set if empty
@@ -71,7 +80,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             dcaOwner,
             userToDcaSchedules[dcaOwner][scheduleId].sellToken
         );
-        // removeUserGasAddress(dcaOwner);
 
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][

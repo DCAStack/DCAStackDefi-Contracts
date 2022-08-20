@@ -50,4 +50,15 @@ contract UserScheduleData {
             _userAddresses.remove(msg.sender);
         }
     }
+
+    function calculateExecutions(
+        uint256 _tradeFrequency,
+        uint256 _startDate,
+        uint256 _endDate
+    ) public pure returns (uint256) {
+        require(_endDate > _startDate, "Invalid dates!");
+        require((_endDate - _startDate) >= _tradeFrequency, "Invalid exec!");
+
+        return ((_endDate - _startDate) / (_tradeFrequency));
+    }
 }
