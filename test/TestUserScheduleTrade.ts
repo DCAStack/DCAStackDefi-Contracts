@@ -219,9 +219,11 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
       expect(EthToDaiSchedule.totalGas).to.equal(BigNumber.from(1));
 
+      await expect(hhUserScheduleTrade
+        .connect(addr1).resumeSchedule(0, BigNumber.from(1))).to.be.reverted;
+
     });
 
-    //TODO add extra params
     it("Should swap ETH to DAI multiple trades pending", async function () {
 
       const tradeAmount = ethers.utils.parseEther("100");
@@ -412,6 +414,9 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToWeth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
       expect(DaiToWeth.totalGas).to.equal(BigNumber.from(1));
+
+      await expect(hhUserScheduleTrade
+        .connect(addr1).resumeSchedule(1, BigNumber.from(1))).to.be.reverted;
 
     });
 
@@ -604,6 +609,9 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
       expect(DaiToEth.totalGas).to.equal(BigNumber.from(1));
+
+      await expect(hhUserScheduleTrade
+        .connect(addr1).resumeSchedule(0, BigNumber.from(scheduleNum))).to.be.reverted;
     });
 
     it("Should swap DAI to ETH multi run pending", async function () {

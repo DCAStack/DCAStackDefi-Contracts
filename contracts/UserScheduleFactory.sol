@@ -32,6 +32,8 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         external
     {
 
+        require(userToDcaSchedules[msg.sender][_dcaScheduleId].remainingBudget > 0, "Schedule complete!");
+
         validateDcaSchedule(
             userToDcaSchedules[msg.sender][_dcaScheduleId].sellToken,
             userToDcaSchedules[msg.sender][_dcaScheduleId].tradeAmount,
@@ -66,12 +68,13 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
 
             for (uint256 i; i < allUserSchedules.length; i++) {
                 if (allUserSchedules[i].isActive == true){
-                uint256 remExec = calculateExecutions(
-                    allUserSchedules[i].tradeFrequency,
-                    allUserSchedules[i].scheduleDates[2],
-                    allUserSchedules[i].scheduleDates[3]
-                    //startDate, lastRun, nextRun, endDate
-                );
+                    
+                    uint256 remExec = calculateExecutions(
+                        allUserSchedules[i].tradeFrequency,
+                        allUserSchedules[i].scheduleDates[2],
+                        allUserSchedules[i].scheduleDates[3]
+                        //startDate, lastRun, nextRun, endDate
+                    );
 
                 committedGasBal += int256(remExec * currGasEstimate);
                 }
@@ -210,15 +213,10 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
             _endDate,
             _sellToken
         );
-        require(getFreeTokenBalance(_sellToken) >= int256(needAmount), "Low bal!");
+        require(needAmount == 0, "Low bal!");
 
         uint256 needGasAmount = calculateGasDeposit(_currGasEstimate, _tradeFrequency, _startDate, _endDate);
-
-        require(
-            getFreeGasBalance(_currGasEstimate) >= int256(needGasAmount),
-            "Low Gas! "
-        );
-
+        require(needGasAmount == 0, "Low gas!");
     }
 
     function createDcaSchedule(

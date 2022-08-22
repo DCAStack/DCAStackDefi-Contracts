@@ -164,6 +164,10 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             "Low Balance!"
         );
 
+        //check rem budget
+        require(userToDcaSchedules[dcaOwner][scheduleId].remainingBudget > 0, "Schedule complete!");
+
+
         IERC20 sellToken = IERC20(sellTokenAddress);
         IERC20 buyToken = IERC20(
             userToDcaSchedules[dcaOwner][scheduleId].buyToken
