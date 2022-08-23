@@ -173,7 +173,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], [], []]);
+      ).to.deep.equal([[ETH_ADDRESS], [BigNumber.from(0)], [BigNumber.from(0)]]);
     });
 
     it("Should deposit/withdraw DAI into contract by addr1", async function () {
@@ -265,7 +265,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], [], []]);
+      ).to.deep.equal([[DAI_CHECKSUM], [BigNumber.from(0)], [BigNumber.from(0)]]);
     });
   });
 
@@ -341,7 +341,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[ETH_ADDRESS], [depositAmount], [depositAmount]]);
+      ).to.deep.equal([[DAI_CHECKSUM, ETH_ADDRESS], [BigNumber.from(0), depositAmount], [BigNumber.from(0), depositAmount]]);
 
       //withdraw all ETH_ADDRESS
       await expect(
@@ -361,7 +361,7 @@ describe("UserScheduleBank Test Suite", function () {
 
       expect(
         await hardhatUserScheduleBank.connect(addr1).getUserAllTokenBalances()
-      ).to.deep.equal([[], [], []]);
+      ).to.deep.equal([[DAI_CHECKSUM, ETH_ADDRESS], [BigNumber.from(0), BigNumber.from(0)], [BigNumber.from(0), BigNumber.from(0)]]);
     });
   });
 

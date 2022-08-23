@@ -81,10 +81,10 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         }
 
         //remove tokens from set if empty
-        removeUserToken(
-            dcaOwner,
-            userToDcaSchedules[dcaOwner][scheduleId].sellToken
-        );
+        // removeUserToken(
+        //     dcaOwner,
+        //     userToDcaSchedules[dcaOwner][scheduleId].sellToken
+        // );
 
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][

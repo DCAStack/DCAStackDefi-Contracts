@@ -99,7 +99,7 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
             );
         }
 
-        removeUserToken(msg.sender, _tokenAddress);
+        // removeUserToken(msg.sender, _tokenAddress);
 
         emit FundsWithdrawn(msg.sender, _tokenAddress, _tokenAmount);
     }
