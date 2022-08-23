@@ -30,11 +30,11 @@ contract UserBankData is Ownable {
         return _userTokens[msg.sender].at(index);
     }
 
-    function removeUserToken(address _user, address _token) internal {
-        if (userTokenBalances[_user][_token] == 0) {
-            _userTokens[_user].remove(_token);
-        }
-    }
+    // function removeUserToken(address _user, address _token) internal {
+    //     if (userTokenBalances[_user][_token] == 0) {
+    //         _userTokens[_user].remove(_token);
+    //     }
+    // }
 
     function addUserToken(address _user, address _token) internal {
         if (!_userTokens[_user].contains(_token)) {
