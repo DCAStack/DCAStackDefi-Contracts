@@ -22,13 +22,13 @@ async function main() {
   console.log("dcastack deployed to:", dcastack.address);
 
 
-  await getTokenFromFaucet(
-    DAI_ADDRESS,
-    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", //send to top 5 accounts
-    ethers.utils.parseEther("100")
-  );
+  // await getTokenFromFaucet(
+  //   DAI_ADDRESS,
+  //   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", //send to top 5 accounts
+  //   ethers.utils.parseEther("100")
+  // );
 
-  console.log("transfer complete!");
+  // console.log("transfer complete!");
 
 }
 

@@ -39,7 +39,7 @@ const { DEPLOYER_PRIVATE_KEY } = process.env;
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   paths: {
-    artifacts: "../DCAStackDefi-FrontEnd/src/artifacts",
+    artifacts: "../FrontEnd/src/artifacts",
   },
   solidity: {
     version: "0.8.9",
@@ -69,13 +69,14 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       accounts: {
-        accountsBalance: "1000000000000000000000000", //wei
+        accountsBalance: process.env.SETUP_TESTS === "true" ? "1000000000000000000000000" : "100000000000000000000", //wei
       },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
-        blockNumber: 13779923,
+        blockNumber: process.env.SETUP_TESTS === "true" ? 13779923 : undefined,
       },
     },
+
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
