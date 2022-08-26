@@ -245,10 +245,10 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         );
 
         addUser();
+        addUserToken(msg.sender, _buyToken);
 
         userToDcaSchedules[msg.sender].push(
             DcaSchedule(
-                msg.sender,
                 _tradeFrequency,
                 _tradeAmount,
                 totalBudget,

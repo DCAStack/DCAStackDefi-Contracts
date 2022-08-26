@@ -1206,7 +1206,6 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(1);
 
-      expect(getSchedules[0].dcaOwner).to.eq(addr1.address);
       expect(getSchedules[0].tradeFrequency).to.eq(tradeFreq);
       expect(getSchedules[0].tradeAmount).to.eq(tradeAmount);
       expect(getSchedules[0].remainingBudget).to.eq(
@@ -1304,7 +1303,6 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(1);
 
-      expect(getSchedules[0].dcaOwner).to.eq(addr1.address);
       expect(getSchedules[0].tradeFrequency).to.eq(tradeFreq);
       expect(getSchedules[0].tradeAmount).to.eq(tradeAmount);
       expect(getSchedules[0].remainingBudget).to.eq(
@@ -1371,7 +1369,6 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(1);
 
-      expect(getSchedules[0].dcaOwner).to.eq(addr1.address);
       expect(getSchedules[0].tradeFrequency).to.eq(tradeFreq);
       expect(getSchedules[0].tradeAmount).to.eq(tradeAmount);
       expect(getSchedules[0].remainingBudget).to.eq(
@@ -1416,7 +1413,6 @@ describe("UserScheduleFactory Test Suite", function () {
         .getUserSchedules();
       expect(getSchedules.length).to.equal(2);
 
-      expect(getSchedules[1].dcaOwner).to.eq(addr1.address);
       expect(getSchedules[1].tradeFrequency).to.eq(tradeFreq);
       expect(getSchedules[1].tradeAmount).to.eq(tradeAmount);
       expect(getSchedules[1].remainingBudget).to.eq(

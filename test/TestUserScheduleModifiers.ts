@@ -191,9 +191,6 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
         await hardhatUserScheduleModifiers.getAllUsersSchedules()
       ).to.deep.equal([[addr1.address], [BigNumber.from("9")]]);
 
-      for (let i = 0; i < getSchedules.length; i++) {
-        expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
-      }
 
       //delete fifth
       await hardhatUserScheduleModifiers.connect(addr1).deleteSchedule(5);
@@ -207,10 +204,6 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
         await hardhatUserScheduleModifiers.getAllUsersSchedules()
       ).to.deep.equal([[addr1.address], [BigNumber.from("8")]]);
 
-      for (let i = 0; i < getSchedules.length; i++) {
-        expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
-      }
-
       //delete last
       await hardhatUserScheduleModifiers.connect(addr1).deleteSchedule(7);
 
@@ -223,9 +216,7 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
         await hardhatUserScheduleModifiers.getAllUsersSchedules()
       ).to.deep.equal([[addr1.address], [BigNumber.from("7")]]);
 
-      for (let i = 0; i < getSchedules.length; i++) {
-        expect(getSchedules[i].dcaOwner).to.eq(addr1.address);
-      }
+
     });
 
     it("Should delete schedule invalid", async function () {
