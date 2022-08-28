@@ -9,8 +9,8 @@ import "solidity-coverage";
 // import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 // import "@nomiclabs/hardhat-ethers";
-// import "hardhat-deploy";
-// import "hardhat-deploy-ethers";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers";
 
 
 dotenv.config();
@@ -38,9 +38,6 @@ const { DEPLOYER_PRIVATE_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
-  paths: {
-    artifacts: "../FrontEnd/src/artifacts",
-  },
   solidity: {
     version: "0.8.9",
     settings: {
@@ -56,10 +53,9 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  // namedAccounts: {
-  //   deployer: 0,
-  //   tokenOwner: 1,
-  // },
+  namedAccounts: {
+    deployer: 0,
+  },
   contractSizer: {
     alphaSort: true,
     disambiguatePaths: false,
@@ -76,6 +72,7 @@ const config: HardhatUserConfig = {
         blockNumber: process.env.SETUP_TESTS === "true" ? 13779923 : undefined,
       },
     },
+
 
   },
   gasReporter: {
