@@ -36,6 +36,9 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         uint256 gasUsed,
         uint256 currentDateTime
     ) internal nonReentrant onlyOwner {
+
+        uint256 startGas = gasleft();
+
         //first, update sell amounts for dcaOwner
         userToDcaSchedules[dcaOwner][scheduleId].remainingBudget =
             userToDcaSchedules[dcaOwner][scheduleId].remainingBudget -
@@ -101,10 +104,13 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             ] = currentDateTime;
         userToDcaSchedules[dcaOwner][scheduleId].soldAmount += soldAmount;
         userToDcaSchedules[dcaOwner][scheduleId].boughtAmount += boughtAmount;
-        userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasUsed;
+
 
         //finally, update gas balance for user
-        userGasBalances[dcaOwner] -= gasUsed;
+        uint256 gasCalc = (gasUsed + (startGas - gasleft()))*tx.gasprice;
+        userGasBalances[dcaOwner] -= gasCalc;
+        userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasCalc;
+
 
         //finally emit event with all the updates/details
         DcaSchedule memory u = userToDcaSchedules[dcaOwner][scheduleId];
@@ -137,6 +143,8 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         uint256 currentDateTime,
         bytes memory swapCallData
     ) external payable onlyOwner {
+
+        uint256 startGas = gasleft();
 
         //not enough gas check
         require(userGasBalances[dcaOwner] > currentGasPrice, "Low Gas!");
@@ -230,12 +238,13 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             soldAmount = soldAmount - address(this).balance;
         }
 
+
         updateUserDCA(
             dcaOwner,
             scheduleId,
             soldAmount,
             boughtAmount,
-            currentGasPrice,
+            startGas - gasleft(),
             currentDateTime
         );
     }
