@@ -65,15 +65,16 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       accounts: {
-        accountsBalance: process.env.SETUP_TESTS === "true" ? "1000000000000000000000000" : "100000000000000000000", //wei
+        accountsBalance:
+          process.env.SETUP_TESTS === "true"
+            ? "1000000000000000000000000"
+            : "100000000000000000000", //wei
       },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
         blockNumber: process.env.SETUP_TESTS === "true" ? 13779923 : undefined,
       },
     },
-
-
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
