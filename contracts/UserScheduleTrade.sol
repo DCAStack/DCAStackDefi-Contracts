@@ -9,7 +9,6 @@ import "./UserScheduleData.sol";
 
 //contract executes User DCA Schedules
 contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
-    address constant AGG_ROUTER_V4 = 0x1111111254fb6c44bAC0beD2854e76F90643097d;
     uint256 MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
@@ -36,7 +35,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         uint256 gasUsed,
         uint256 currentDateTime
     ) internal nonReentrant onlyOwner {
-
         uint256 startGas = gasleft();
 
         //first, update sell amounts for dcaOwner
@@ -52,7 +50,9 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             soldAmount;
 
         //update last run
-        userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[1] = userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2];
+        userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[
+                1
+            ] = userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2];
 
         //if rem budget or user bal is empty, schedule gets paused
         if (
@@ -66,7 +66,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             // userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
             //startDate, lastRun, nextRun, endDate
         } else {
-
             //update end date if needed
             uint256 numExec = calculateExecutions(
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency,
@@ -80,7 +79,10 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
 
             //update end date based on when last ran
-            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] = currentDateTime + (userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency*numExec);
+            userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] =
+                currentDateTime +
+                (userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency *
+                    numExec);
         }
 
         //remove tokens from set if empty
@@ -105,12 +107,10 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         userToDcaSchedules[dcaOwner][scheduleId].soldAmount += soldAmount;
         userToDcaSchedules[dcaOwner][scheduleId].boughtAmount += boughtAmount;
 
-
         //finally, update gas balance for user
-        uint256 gasCalc = (gasUsed + (startGas - gasleft()))*tx.gasprice;
+        uint256 gasCalc = (gasUsed + (startGas - gasleft())) * tx.gasprice;
         userGasBalances[dcaOwner] -= gasCalc;
         userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasCalc;
-
 
         //finally emit event with all the updates/details
         DcaSchedule memory u = userToDcaSchedules[dcaOwner][scheduleId];
@@ -141,9 +141,9 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         uint256 scheduleId,
         uint256 currentGasPrice,
         uint256 currentDateTime,
-        bytes memory swapCallData
+        bytes memory swapCallData,
+        address aggRouter1inch
     ) external payable onlyOwner {
-
         uint256 startGas = gasleft();
 
         //not enough gas check
@@ -173,8 +173,10 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         );
 
         //check rem budget
-        require(userToDcaSchedules[dcaOwner][scheduleId].remainingBudget > 0, "Schedule complete!");
-
+        require(
+            userToDcaSchedules[dcaOwner][scheduleId].remainingBudget > 0,
+            "Schedule complete!"
+        );
 
         IERC20 sellToken = IERC20(sellTokenAddress);
         IERC20 buyToken = IERC20(
@@ -184,9 +186,9 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         //approve sell token max
         if (!isETH(sellToken)) {
             if (
-                sellToken.allowance(address(this), AGG_ROUTER_V4) < sellAmount
+                sellToken.allowance(address(this), aggRouter1inch) < sellAmount
             ) {
-                sellToken.approve(AGG_ROUTER_V4, MAX_INT);
+                sellToken.approve(aggRouter1inch, MAX_INT);
             }
         }
 
@@ -210,7 +212,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         assembly {
             let result := call(
                 gas(),
-                AGG_ROUTER_V4,
+                aggRouter1inch,
                 callvalue(),
                 add(swapCallData, 0x20),
                 mload(swapCallData),
@@ -238,7 +240,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             soldAmount = soldAmount - address(this).balance;
         }
 
-
         updateUserDCA(
             dcaOwner,
             scheduleId,
@@ -248,5 +249,4 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             currentDateTime
         );
     }
-
 }
