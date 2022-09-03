@@ -8,10 +8,8 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 // import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
-// import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
-
 
 dotenv.config();
 
@@ -77,7 +75,7 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    enabled: process.env.REPORT_GAS !== "false",
     currency: "USD",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
