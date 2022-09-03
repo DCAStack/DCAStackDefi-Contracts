@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
 
@@ -46,7 +46,7 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
             _tokenAmount;
 
         (bool success, ) = msg.sender.call{value: _tokenAmount}("");
-        require(success, "_transfer: ETH transfer failed");
+        require(success, "withdrawGas failed!");
 
         emit FundsWithdrawn(msg.sender, ETH, _tokenAmount);
     }
@@ -90,7 +90,7 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
 
         if (_tokenAddress == ETH) {
             (bool success, ) = msg.sender.call{value: _tokenAmount}("");
-            require(success, "_transfer: ETH transfer failed");
+            require(success, "withdrawFunds failed!");
         } else {
             SafeERC20.safeTransfer(
                 IERC20(_tokenAddress),

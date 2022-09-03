@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
 
@@ -29,7 +29,6 @@ contract UserBankData is Ownable {
     {
         return _userTokens[msg.sender].at(index);
     }
-
 
     function addUserToken(address _user, address _token) internal {
         if (!_userTokens[_user].contains(_token)) {

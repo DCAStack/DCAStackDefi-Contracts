@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
 
@@ -31,8 +31,10 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
     function resumeSchedule(uint256 _dcaScheduleId, uint256 currGasEstimate)
         external
     {
-
-        require(userToDcaSchedules[msg.sender][_dcaScheduleId].remainingBudget > 0, "Schedule complete!");
+        require(
+            userToDcaSchedules[msg.sender][_dcaScheduleId].remainingBudget > 0,
+            "Schedule complete!"
+        );
 
         validateDcaSchedule(
             userToDcaSchedules[msg.sender][_dcaScheduleId].sellToken,
@@ -67,8 +69,7 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
             int256 committedGasBal;
 
             for (uint256 i; i < allUserSchedules.length; i++) {
-                if (allUserSchedules[i].isActive == true){
-                    
+                if (allUserSchedules[i].isActive == true) {
                     uint256 remExec = calculateExecutions(
                         allUserSchedules[i].tradeFrequency,
                         allUserSchedules[i].scheduleDates[2],
@@ -76,7 +77,7 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
                         //startDate, lastRun, nextRun, endDate
                     );
 
-                committedGasBal += int256(remExec * currGasEstimate);
+                    committedGasBal += int256(remExec * currGasEstimate);
                 }
             }
 
@@ -105,7 +106,10 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
             int256 committedBal = 0;
 
             for (uint256 i; i < allUserSchedules.length; i++) {
-                if (allUserSchedules[i].sellToken == _tokenAddress && allUserSchedules[i].isActive == true) {
+                if (
+                    allUserSchedules[i].sellToken == _tokenAddress &&
+                    allUserSchedules[i].isActive == true
+                ) {
                     committedBal += int256(allUserSchedules[i].remainingBudget);
                 }
             }
@@ -163,15 +167,15 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
 
         uint256 neededDeposit = 0;
 
-        if (totalBudget - gotFreeTokenBalance > 0){
+        if (totalBudget - gotFreeTokenBalance > 0) {
             neededDeposit = uint256(totalBudget - gotFreeTokenBalance);
         }
-        
+
         return neededDeposit;
     }
 
     function calculateGasDeposit(
-        uint256 _tradeAmount, 
+        uint256 _tradeAmount,
         uint256 _tradeFrequency,
         uint256 _startDate,
         uint256 _endDate
@@ -187,13 +191,13 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
 
         int256 totalBudget = int256(_tradeAmount * totalExecutions);
         int256 gotFreeGasBalance = getFreeGasBalance(_tradeAmount);
-        
+
         uint256 neededDeposit = 0;
 
-        if (totalBudget - gotFreeGasBalance > 0){
+        if (totalBudget - gotFreeGasBalance > 0) {
             neededDeposit = uint256(totalBudget - gotFreeGasBalance);
         }
-        
+
         return neededDeposit;
     }
 
@@ -215,7 +219,12 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         );
         require(needAmount == 0, "Low bal!");
 
-        uint256 needGasAmount = calculateGasDeposit(_currGasEstimate, _tradeFrequency, _startDate, _endDate);
+        uint256 needGasAmount = calculateGasDeposit(
+            _currGasEstimate,
+            _tradeFrequency,
+            _startDate,
+            _endDate
+        );
         require(needGasAmount == 0, "Low gas!");
     }
 

@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.9;
 
@@ -9,7 +9,7 @@ import "./UserScheduleData.sol";
 
 //contract executes User DCA Schedules
 contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
-    uint256 MAX_INT =
+    uint256 constant MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     event BoughtTokens(
@@ -63,8 +63,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             0
         ) {
             userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
-            // userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] = 0;
-            //startDate, lastRun, nextRun, endDate
         } else {
             //update end date if needed
             uint256 numExec = calculateExecutions(
@@ -85,12 +83,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                     numExec);
         }
 
-        //remove tokens from set if empty
-        // removeUserToken(
-        //     dcaOwner,
-        //     userToDcaSchedules[dcaOwner][scheduleId].sellToken
-        // );
-
         //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][
             userToDcaSchedules[dcaOwner][scheduleId].buyToken
@@ -107,10 +99,14 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         userToDcaSchedules[dcaOwner][scheduleId].soldAmount += soldAmount;
         userToDcaSchedules[dcaOwner][scheduleId].boughtAmount += boughtAmount;
 
-        //finally, update gas balance for user
+        //fourth, update gas balance for user
         uint256 gasCalc = (gasUsed + (startGas - gasleft())) * tx.gasprice;
         userGasBalances[dcaOwner] -= gasCalc;
         userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasCalc;
+
+        //then refund gas to owner
+        (bool success, ) = msg.sender.call{value: gasCalc}("");
+        require(success, "Gas refund failed!");
 
         //finally emit event with all the updates/details
         DcaSchedule memory u = userToDcaSchedules[dcaOwner][scheduleId];

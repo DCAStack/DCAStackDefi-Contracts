@@ -145,6 +145,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         0,
@@ -156,6 +158,10 @@ describe("UserScheduleTrade Test Suite", function () {
           value: ethers.utils.parseEther("100"),
         }
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalEthBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -208,6 +214,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       await expect(DCAStack.connect(addr1).resumeSchedule(0, BigNumber.from(1)))
         .to.be.reverted;
+
     });
 
     it("Should swap ETH to DAI multiple trades pending", async function () {
@@ -244,6 +251,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         scheduleNum,
@@ -256,6 +265,10 @@ describe("UserScheduleTrade Test Suite", function () {
           value: tradeAmount,
         }
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalEthBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -328,6 +341,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         1,
@@ -336,6 +351,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToWethCallData,
         AGG_ROUTER_V4
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalWethBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -372,7 +391,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           0,
           false,
-          142754,
+          140645,
           finalGasBalance,
           startDate,
           addr1.address
@@ -429,6 +448,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         scheduleNum,
@@ -437,6 +458,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToWethCallData,
         AGG_ROUTER_V4
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalWethBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -473,7 +498,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          142754,
+          140645,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -512,6 +537,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         scheduleNum,
@@ -520,6 +547,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToEthCallData,
         AGG_ROUTER_V4
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalEthBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -552,7 +583,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           0,
           false,
-          230743,
+          228634,
           finalGasBalance,
           startDate,
           addr1.address
@@ -607,6 +638,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         scheduleNum,
@@ -615,6 +648,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToEthCallData,
         AGG_ROUTER_V4
       );
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalEthBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -647,7 +684,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          230743,
+          228634,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -702,6 +739,8 @@ describe("UserScheduleTrade Test Suite", function () {
       );
       const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
 
+      let addr1GasBefore = await addr1.getBalance();
+
       const tx = await DCAStack.runUserDCA(
         addr1.address,
         scheduleNum,
@@ -710,6 +749,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToEthCallData,
         AGG_ROUTER_V4
       );
+
+      let addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       const finalEthBalance = await DCAStack.userTokenBalances(
         addr1.address,
@@ -742,7 +785,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("200"),
           true,
-          230743,
+          228634,
           finalGasBalance,
           startDateTest + tradeFreq,
           addr1.address
@@ -766,6 +809,8 @@ describe("UserScheduleTrade Test Suite", function () {
       DaiToEth = userSchedules[scheduleNum];
       expect(DaiToEth.isActive).to.equal(false);
 
+      addr1GasBefore = await addr1.getBalance();
+
       await expect(
         DCAStack.runUserDCA(
           addr1.address,
@@ -777,11 +822,17 @@ describe("UserScheduleTrade Test Suite", function () {
         )
       ).to.be.reverted;
 
+      addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
+
       DCAStack.connect(addr1).resumeSchedule(scheduleNum, 1);
 
       userSchedules = await DCAStack.connect(addr1).getUserSchedules();
       DaiToEth = userSchedules[scheduleNum];
       expect(DaiToEth.isActive).to.equal(true);
+
+      addr1GasBefore = await addr1.getBalance();
 
       await DCAStack.runUserDCA(
         addr1.address,
@@ -791,6 +842,10 @@ describe("UserScheduleTrade Test Suite", function () {
         daiToEthCallData,
         AGG_ROUTER_V4
       );
+
+      addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
 
       userSchedules = await DCAStack.connect(addr1).getUserSchedules();
       DaiToEth = userSchedules[scheduleNum];
@@ -829,6 +884,8 @@ describe("UserScheduleTrade Test Suite", function () {
         BigNumber.from(1)
       );
 
+      const addr1GasBefore = await addr1.getBalance();
+
       await expect(
         DCAStack.runUserDCA(
           addr2.address,
@@ -839,6 +896,10 @@ describe("UserScheduleTrade Test Suite", function () {
           AGG_ROUTER_V4
         )
       ).to.be.reverted;
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
     });
 
     it("Should not swap due to low token balance", async function () {
@@ -865,6 +926,8 @@ describe("UserScheduleTrade Test Suite", function () {
 
       await DCAStack.connect(addr2).withdrawFunds(DAI_ADDRESS, tradeAmount);
 
+      const addr1GasBefore = await addr1.getBalance();
+
       await expect(
         DCAStack.runUserDCA(
           addr2.address,
@@ -875,6 +938,10 @@ describe("UserScheduleTrade Test Suite", function () {
           AGG_ROUTER_V4
         )
       ).to.be.reverted;
+
+      const addr1GasAfter = await addr1.getBalance();
+
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
     });
 
     it("Should not swap due to paused schedule", async function () {
@@ -899,6 +966,8 @@ describe("UserScheduleTrade Test Suite", function () {
         BigNumber.from(1)
       );
 
+      let addr1GasBefore = await addr1.getBalance();
+
       await expect(
         DCAStack.runUserDCA(
           addr2.address,
@@ -909,6 +978,11 @@ describe("UserScheduleTrade Test Suite", function () {
           AGG_ROUTER_V4
         )
       ).to.not.be.reverted;
+
+      let addr1GasAfter = await addr1.getBalance();
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
+
+      addr1GasBefore = await addr1.getBalance();
 
       // reverts because schedule concluded
       await expect(
@@ -921,7 +995,11 @@ describe("UserScheduleTrade Test Suite", function () {
           AGG_ROUTER_V4
         )
       ).to.be.reverted;
+
+      addr1GasAfter = await addr1.getBalance();
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
     });
+
 
     it("Should not swap due to not ready time", async function () {
       await getTokenFromFaucet(
@@ -945,6 +1023,8 @@ describe("UserScheduleTrade Test Suite", function () {
         BigNumber.from(1)
       );
 
+      const addr1GasBefore = await addr1.getBalance();
+
       await expect(
         DCAStack.runUserDCA(
           addr2.address,
@@ -955,6 +1035,9 @@ describe("UserScheduleTrade Test Suite", function () {
           AGG_ROUTER_V4
         )
       ).to.be.reverted;
+
+      const addr1GasAfter = await addr1.getBalance();
+      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
     });
   });
 });
