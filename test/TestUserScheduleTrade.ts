@@ -194,7 +194,7 @@ describe("UserScheduleTrade Test Suite", function () {
           daiBalDiff,
           0,
           false,
-          268856,
+          271764,
           finalGasBalance,
           startDate,
           addr1.address
@@ -301,7 +301,7 @@ describe("UserScheduleTrade Test Suite", function () {
           daiBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          268856,
+          271764,
           finalGasBalance,
           startDate + tradeFreq,
           addr1.address
@@ -391,7 +391,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           0,
           false,
-          140645,
+          143986,
           finalGasBalance,
           startDate,
           addr1.address
@@ -498,7 +498,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          140645,
+          143986,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -583,7 +583,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           0,
           false,
-          228634,
+          232616,
           finalGasBalance,
           startDate,
           addr1.address
@@ -684,7 +684,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          228634,
+          232616,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -785,7 +785,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("200"),
           true,
-          228634,
+          232616,
           finalGasBalance,
           startDateTest + tradeFreq,
           addr1.address
