@@ -47,11 +47,6 @@ describe("UserScheduleFactory Test Suite", function () {
         .withArgs(addr1, ETH_ADDRESS, depositAmount);
 
       userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
-      console.log(
-        "test",
-        userDepositedBal.toString(),
-        depositAmount.toString()
-      );
       expect(userDepositedBal).to.eq(depositAmount);
     });
 
