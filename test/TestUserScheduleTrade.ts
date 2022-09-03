@@ -183,6 +183,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = finalDaiBalance.sub(initialDaiBalance);
       const ethBalDiff = initialEthBalance.sub(finalEthBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -194,7 +195,7 @@ describe("UserScheduleTrade Test Suite", function () {
           daiBalDiff,
           0,
           false,
-          271764,
+          gasBalDiff,
           finalGasBalance,
           startDate,
           addr1.address
@@ -210,11 +211,10 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(EthToDaiSchedule.scheduleDates[3]).to.equal(endDate);
       expect(EthToDaiSchedule.soldAmount).to.equal(ethBalDiff);
       expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
-      expect(EthToDaiSchedule.totalGas).to.be.gt(BigNumber.from(1));
+      expect(EthToDaiSchedule.totalGas).to.be.eq(gasBalDiff);
 
       await expect(DCAStack.connect(addr1).resumeSchedule(0, BigNumber.from(1)))
         .to.be.reverted;
-
     });
 
     it("Should swap ETH to DAI multiple trades pending", async function () {
@@ -290,6 +290,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = finalDaiBalance.sub(initialDaiBalance);
       const ethBalDiff = initialEthBalance.sub(finalEthBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -301,7 +302,7 @@ describe("UserScheduleTrade Test Suite", function () {
           daiBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          271764,
+          gasBalDiff,
           finalGasBalance,
           startDate + tradeFreq,
           addr1.address
@@ -319,7 +320,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(EthToDaiSchedule.scheduleDates[3]).to.equal(endDate);
       expect(EthToDaiSchedule.soldAmount).to.equal(ethBalDiff);
       expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
-      expect(EthToDaiSchedule.totalGas).to.be.gt(BigNumber.from(1));
+      expect(EthToDaiSchedule.totalGas).to.be.eq(gasBalDiff);
     });
   });
 
@@ -380,6 +381,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
       const wethBalDiff = finalWethBalance.sub(initialWethBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -391,7 +393,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           0,
           false,
-          143986,
+          gasBalDiff,
           finalGasBalance,
           startDate,
           addr1.address
@@ -407,7 +409,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToWeth.scheduleDates[3]).to.equal(endDate);
       expect(DaiToWeth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
-      expect(DaiToWeth.totalGas).to.be.gt(BigNumber.from(1));
+      expect(DaiToWeth.totalGas).to.be.eq(gasBalDiff);
 
       await expect(DCAStack.connect(addr1).resumeSchedule(1, BigNumber.from(1)))
         .to.be.reverted;
@@ -487,6 +489,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
       const wethBalDiff = finalWethBalance.sub(initialWethBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -498,7 +501,7 @@ describe("UserScheduleTrade Test Suite", function () {
           wethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          143986,
+          gasBalDiff,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -516,7 +519,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToWeth.scheduleDates[3]).to.equal(endDate);
       expect(DaiToWeth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
-      expect(DaiToWeth.totalGas).to.be.gt(BigNumber.from(1));
+      expect(DaiToWeth.totalGas).to.be.eq(gasBalDiff);
     });
   });
 
@@ -572,6 +575,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
       const ethBalDiff = finalEthBalance.sub(initialEthBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -583,7 +587,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           0,
           false,
-          232616,
+          gasBalDiff,
           finalGasBalance,
           startDate,
           addr1.address
@@ -599,7 +603,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.scheduleDates[3]).to.equal(endDate);
       expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
-      expect(DaiToEth.totalGas).to.be.gt(BigNumber.from(1));
+      expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
 
       await expect(
         DCAStack.connect(addr1).resumeSchedule(0, BigNumber.from(scheduleNum))
@@ -673,6 +677,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
       const ethBalDiff = finalEthBalance.sub(initialEthBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -684,7 +689,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("100"),
           true,
-          232616,
+          gasBalDiff,
           finalGasBalance,
           currentDateTime + tradeFreq,
           addr1.address
@@ -700,7 +705,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.scheduleDates[3]).to.equal(endDate);
       expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
-      expect(DaiToEth.totalGas).to.be.gt(BigNumber.from(1));
+      expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
     });
   });
 
@@ -774,6 +779,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
       const ethBalDiff = finalEthBalance.sub(initialEthBalance);
+      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
 
       await expect(tx)
         .to.emit(DCAStack, "BoughtTokens")
@@ -785,7 +791,7 @@ describe("UserScheduleTrade Test Suite", function () {
           ethBalDiff,
           ethers.utils.parseEther("200"),
           true,
-          232616,
+          gasBalDiff,
           finalGasBalance,
           startDateTest + tradeFreq,
           addr1.address
@@ -801,7 +807,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.scheduleDates[3]).to.equal(endDateTest);
       expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
-      expect(DaiToEth.totalGas).to.be.gt(BigNumber.from(1));
+      expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
 
       DCAStack.connect(addr1).pauseSchedule(scheduleNum);
 
@@ -999,7 +1005,6 @@ describe("UserScheduleTrade Test Suite", function () {
       addr1GasAfter = await addr1.getBalance();
       expect(addr1GasBefore).to.be.gte(addr1GasAfter);
     });
-
 
     it("Should not swap due to not ready time", async function () {
       await getTokenFromFaucet(

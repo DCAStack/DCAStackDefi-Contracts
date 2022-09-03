@@ -120,7 +120,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                 boughtAmount,
                 u.remainingBudget,
                 u.isActive,
-                gasUsed,
+                gasCalc,
                 remGas,
                 u.scheduleDates[2], //startDate, lastRun, nextRun, endDate
                 dcaOwner
