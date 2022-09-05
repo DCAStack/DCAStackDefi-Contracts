@@ -6,10 +6,14 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-// import "@openzeppelin/hardhat-upgrades";
+import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+
+// Libraries
+import assert from "assert";
+import { exec } from "child_process";
 
 dotenv.config();
 
@@ -18,13 +22,35 @@ dotenv.config();
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
 
+  console.log("doing something")
   for (const account of accounts) {
     console.log(account.address);
   }
 });
 
-// Libraries
-import assert from "assert";
+task(
+  "copy-deploy",
+  "Copies deployments to dependents",
+  async (taskArgs, hre) => {
+    exec(
+      "cp -r deployments/* ../FrontEnd/src/deployments/",
+      (err, stdout, stderr) => {
+        if (err || stderr || stdout) {
+          console.log("Deployment folder copy error: ", err, stderr, stdout);
+        }
+      }
+    );
+
+    exec(
+      "cp -r deployments/* ../Defender/src/deployments/",
+      (err, stdout, stderr) => {
+        if (err || stderr || stdout) {
+          console.log("Deployment folder copy error: ", err, stderr, stdout);
+        }
+      }
+    );
+  }
+);
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
@@ -66,7 +92,7 @@ const config: HardhatUserConfig = {
         accountsBalance:
           process.env.SETUP_TESTS === "true"
             ? "1000000000000000000000000"
-            : "100000000000000000000", //wei
+            : "100000000000000000000", // wei
       },
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
