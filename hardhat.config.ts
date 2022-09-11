@@ -33,7 +33,7 @@ task(
   "Copies deployments to dependents",
   async (taskArgs, hre) => {
     exec(
-      "cp -r deployments/* ../FrontEnd/src/deployments/",
+      "cp -r deployments/* ../Frontend/src/deployments/",
       (err, stdout, stderr) => {
         if (err || stderr || stdout) {
           console.log("Deployment folder copy error: ", err, stderr, stdout);
