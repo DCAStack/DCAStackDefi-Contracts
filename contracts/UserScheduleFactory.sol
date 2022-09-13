@@ -52,7 +52,7 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         return userToDcaSchedules[msg.sender];
     }
 
-    //get gas deposited not in use by schedules (includes paused)
+    //get gas deposited not in use by schedules (excludes paused)
     function getFreeGasBalance(uint256 currGasEstimate)
         public
         view
@@ -87,7 +87,7 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         return freeGasBal;
     }
 
-    //get funds deposited not in use by schedules (includes paused)
+    //get funds deposited not in use by schedules (excludes paused)
     function getFreeTokenBalance(address _tokenAddress)
         public
         view
