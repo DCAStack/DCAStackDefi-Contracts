@@ -24,30 +24,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         removeUserFromSet();
     }
 
-    function pauseSchedule(uint256 _dcaScheduleId) external {
-        userToDcaSchedules[msg.sender][_dcaScheduleId].isActive = false;
-    }
-
-    function resumeSchedule(uint256 _dcaScheduleId, uint256 currGasEstimate)
-        external
-    {
-        require(
-            userToDcaSchedules[msg.sender][_dcaScheduleId].remainingBudget > 0,
-            "Schedule complete!"
-        );
-
-        validateDcaSchedule(
-            userToDcaSchedules[msg.sender][_dcaScheduleId].sellToken,
-            userToDcaSchedules[msg.sender][_dcaScheduleId].tradeAmount,
-            userToDcaSchedules[msg.sender][_dcaScheduleId].tradeFrequency,
-            userToDcaSchedules[msg.sender][_dcaScheduleId].scheduleDates[2], //nextRun
-            userToDcaSchedules[msg.sender][_dcaScheduleId].scheduleDates[3], //endDate
-            currGasEstimate
-        );
-
-        userToDcaSchedules[msg.sender][_dcaScheduleId].isActive = true;
-    }
-
     function getUserSchedules() public view returns (DcaSchedule[] memory) {
         return userToDcaSchedules[msg.sender];
     }
