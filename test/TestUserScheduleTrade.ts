@@ -213,8 +213,7 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(EthToDaiSchedule.boughtAmount).to.equal(daiBalDiff);
       expect(EthToDaiSchedule.totalGas).to.be.eq(gasBalDiff);
 
-      await expect(DCAStack.connect(addr1).resumeSchedule(0, BigNumber.from(1)))
-        .to.be.reverted;
+
     });
 
     it("Should swap ETH to DAI multiple trades pending", async function () {
@@ -411,8 +410,6 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToWeth.boughtAmount).to.equal(wethBalDiff);
       expect(DaiToWeth.totalGas).to.be.eq(gasBalDiff);
 
-      await expect(DCAStack.connect(addr1).resumeSchedule(1, BigNumber.from(1)))
-        .to.be.reverted;
     });
 
     it("Should swap DAI to WETH multi run pending", async function () {
@@ -605,9 +602,6 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
       expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
 
-      await expect(
-        DCAStack.connect(addr1).resumeSchedule(0, BigNumber.from(scheduleNum))
-      ).to.be.reverted;
     });
 
     it("Should swap DAI to ETH multi run pending", async function () {
@@ -706,165 +700,6 @@ describe("UserScheduleTrade Test Suite", function () {
       expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
       expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
       expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
-    });
-  });
-
-  describe("Swap after user resumes schedule", function () {
-    it("Should swap DAI to ETH multi run pending after resume", async function () {
-      const tradeAmount = ethers.utils.parseEther("100");
-      const depositAmount = ethers.utils.parseEther("300");
-      const startDateTest =
-        new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
-      const endDateTest = startDateTest + 86400 * 3; // add 2 days
-      const scheduleNum = 3; // since we're adding 4th schedule
-
-      await DCAStack.connect(addr1).depositFunds(DAI_ADDRESS, depositAmount);
-
-      // 4th schedule
-      await DCAStack.connect(addr1).createDcaSchedule(
-        tradeFreq,
-        tradeAmount,
-        ETH_ADDRESS,
-        DAI_ADDRESS,
-        startDateTest,
-        endDateTest,
-        BigNumber.from(1)
-      );
-
-      const initialEthBalance = await DCAStack.userTokenBalances(
-        addr1.address,
-        ETH_ADDRESS
-      );
-      const initialDaiBalance = await DCAStack.userTokenBalances(
-        addr1.address,
-        DAI_ADDRESS
-      );
-      const initialContractDaiBalance = await DAI_IERC20.balanceOf(
-        DCAStack.address
-      );
-      const initialGasBalance = await DCAStack.userGasBalances(addr1.address);
-
-      let addr1GasBefore = await addr1.getBalance();
-
-      const tx = await DCAStack.runUserDCA(
-        addr1.address,
-        scheduleNum,
-        1,
-        startDateTest,
-        daiToEthCallData,
-        AGG_ROUTER_V4
-      );
-
-      let addr1GasAfter = await addr1.getBalance();
-
-      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
-
-      const finalEthBalance = await DCAStack.userTokenBalances(
-        addr1.address,
-        ETH_ADDRESS
-      );
-      const finalDaiBalance = await DCAStack.userTokenBalances(
-        addr1.address,
-        DAI_ADDRESS
-      );
-      const finalDaiContractBalance = await DAI_IERC20.balanceOf(
-        DCAStack.address
-      );
-      const finalGasBalance = await DCAStack.userGasBalances(addr1.address);
-
-      expect(initialDaiBalance).gt(finalDaiBalance);
-      expect(finalEthBalance).gt(initialEthBalance);
-      expect(initialContractDaiBalance).gt(finalDaiContractBalance);
-      expect(initialGasBalance).gt(finalGasBalance);
-
-      const daiBalDiff = initialDaiBalance.sub(finalDaiBalance);
-      const ethBalDiff = finalEthBalance.sub(initialEthBalance);
-      const gasBalDiff = initialGasBalance.sub(finalGasBalance);
-
-      await expect(tx)
-        .to.emit(DCAStack, "BoughtTokens")
-        .withArgs(
-          scheduleNum,
-          DAI_CHECKSUM,
-          ETH_ADDRESS,
-          daiBalDiff,
-          ethBalDiff,
-          ethers.utils.parseEther("200"),
-          true,
-          gasBalDiff,
-          finalGasBalance,
-          startDateTest + tradeFreq,
-          addr1.address
-        );
-
-      let userSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      let DaiToEth = userSchedules[scheduleNum];
-      expect(DaiToEth.remainingBudget).to.equal(ethers.utils.parseEther("200"));
-      expect(DaiToEth.isActive).to.equal(true);
-      expect(DaiToEth.scheduleDates[0]).to.equal(startDateTest);
-      expect(DaiToEth.scheduleDates[1]).to.equal(startDateTest);
-      expect(DaiToEth.scheduleDates[2]).to.equal(startDateTest + tradeFreq);
-      expect(DaiToEth.scheduleDates[3]).to.equal(endDateTest);
-      expect(DaiToEth.soldAmount).to.equal(daiBalDiff);
-      expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
-      expect(DaiToEth.totalGas).to.be.eq(gasBalDiff);
-
-      DCAStack.connect(addr1).pauseSchedule(scheduleNum);
-
-      userSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      DaiToEth = userSchedules[scheduleNum];
-      expect(DaiToEth.isActive).to.equal(false);
-
-      addr1GasBefore = await addr1.getBalance();
-
-      await expect(
-        DCAStack.runUserDCA(
-          addr1.address,
-          scheduleNum,
-          1,
-          currentDateTime,
-          daiToEthCallData,
-          AGG_ROUTER_V4
-        )
-      ).to.be.reverted;
-
-      addr1GasAfter = await addr1.getBalance();
-
-      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
-
-      DCAStack.connect(addr1).resumeSchedule(scheduleNum, 1);
-
-      userSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      DaiToEth = userSchedules[scheduleNum];
-      expect(DaiToEth.isActive).to.equal(true);
-
-      addr1GasBefore = await addr1.getBalance();
-
-      await DCAStack.runUserDCA(
-        addr1.address,
-        scheduleNum,
-        1,
-        currentDateTime,
-        daiToEthCallData,
-        AGG_ROUTER_V4
-      );
-
-      addr1GasAfter = await addr1.getBalance();
-
-      expect(addr1GasBefore).to.be.gte(addr1GasAfter);
-
-      userSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      DaiToEth = userSchedules[scheduleNum];
-      expect(DaiToEth.isActive).to.equal(true);
-      expect(DaiToEth.scheduleDates[0]).to.equal(startDateTest);
-      expect(DaiToEth.scheduleDates[1]).to.equal(currentDateTime);
-      expect(DaiToEth.scheduleDates[2]).to.equal(currentDateTime + tradeFreq);
-      expect(DaiToEth.scheduleDates[3]).to.equal(
-        currentDateTime + tradeFreq * 2
-      );
-      expect(DaiToEth.soldAmount).to.equal(parseEther("200"));
-      // expect(DaiToEth.boughtAmount).to.equal(ethBalDiff);
-      expect(DaiToEth.totalGas).to.be.gt(BigNumber.from(1));
     });
   });
 

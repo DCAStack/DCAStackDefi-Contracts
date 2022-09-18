@@ -54,14 +54,8 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
                 1
             ] = userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2];
 
-        //if rem budget or user bal is empty, schedule gets paused
-        if (
-            userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0 ||
-            userTokenBalances[dcaOwner][
-                userToDcaSchedules[dcaOwner][scheduleId].sellToken
-            ] ==
-            0
-        ) {
+        //if rem budget is empty, schedule is inactive
+        if (userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0) {
             userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
         } else {
             //update end date if needed
@@ -155,7 +149,7 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         //schedule not active
         require(
             userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
-            "Paused!"
+            "Complete!"
         );
 
         //check if user has enough for trade

@@ -85,40 +85,7 @@ describe("UserScheduleFactory Test Suite", function () {
       );
     });
 
-    it("Should calculate free gas balance with paused schedule", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
 
-      let userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
-      expect(userDepositedBal).to.eq(0);
-
-      await DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      await DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
-      expect(userDepositedBal).to.eq(depositAmount);
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          86400,
-          ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
-          new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
-          ethers.utils.parseEther("0.01")
-        )
-      ).to.not.be.reverted;
-
-      await DCAStack.connect(addr1).pauseSchedule(0);
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(
-        ethers.utils.parseEther("0.01")
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-    });
 
     it("Should calculate free gas balance negative case", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
@@ -196,44 +163,7 @@ describe("UserScheduleFactory Test Suite", function () {
       );
     });
 
-    it("Should calculate free token balance ETH with paused schedule", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
 
-      let userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(0);
-
-      await DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
-
-      await DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          86400,
-          ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
-          new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
-          ethers.utils.parseEther("0.01")
-        )
-      ).to.not.be.reverted;
-
-      await DCAStack.connect(addr1).pauseSchedule(0);
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-    });
 
     it("Should calculate free token balance ETH negative case", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
@@ -335,45 +265,7 @@ describe("UserScheduleFactory Test Suite", function () {
       );
     });
 
-    it("Should calculate free token balance DAI with paused schedule", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
-
-      let userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        DAI_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(0);
-
-      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
-      await dai.connect(addr1).approve(DCAStack.address, depositAmount);
-
-      DCAStack.connect(addr1).depositFunds(DAI_ADDRESS, depositAmount);
-
-      DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        DAI_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          86400,
-          ethers.utils.parseEther("0.01"),
-          ETH_ADDRESS,
-          DAI_ADDRESS,
-          new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
-          new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
-          ethers.utils.parseEther("0.01")
-        )
-      ).to.not.be.reverted;
-
-      DCAStack.connect(addr1).pauseSchedule(0);
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        DAI_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-    });
+    
 
     it("Should calculate free token balance DAI negative case", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
