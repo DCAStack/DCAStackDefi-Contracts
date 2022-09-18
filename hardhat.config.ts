@@ -99,12 +99,22 @@ const config: HardhatUserConfig = {
         blockNumber: process.env.SETUP_TESTS === "true" ? 13779923 : undefined,
       },
     },
+    polygon: {
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.POLYGON_ALCHEMY_ID}`,
+      accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== "false",
     currency: "USD",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
+  verify: { //hardhat deploy verify
+    etherscan: {
+      apiKey: process.env.ETHERSCAN_API_KEY,
+    },
+  },
+
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
