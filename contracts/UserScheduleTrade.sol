@@ -26,7 +26,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         address indexed dcaOwner
     );
 
-    //function tallies user funds, gas, and schedule details
     function updateUserDCA(
         address dcaOwner,
         uint256 scheduleId,
@@ -37,7 +36,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
     ) internal nonReentrant onlyOwner {
         uint256 startGas = gasleft();
 
-        //first, update sell amounts for dcaOwner
         userToDcaSchedules[dcaOwner][scheduleId].remainingBudget =
             userToDcaSchedules[dcaOwner][scheduleId].remainingBudget -
             soldAmount;
@@ -49,35 +47,31 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             ] -
             soldAmount;
 
-        //update last run
         userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[
                 1
             ] = userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2];
 
-        //if rem budget is empty, schedule is inactive
         if (userToDcaSchedules[dcaOwner][scheduleId].remainingBudget == 0) {
             userToDcaSchedules[dcaOwner][scheduleId].isActive = false;
         } else {
-            //update end date if needed
             uint256 numExec = calculateExecutions(
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency,
                 userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2], //nextRun
                 userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] //endDate
             );
 
-            //if still good, update next run
+            //next run
             userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2] =
                 currentDateTime +
                 userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency;
 
-            //update end date based on when last ran
+            //end date
             userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[3] =
                 currentDateTime +
                 (userToDcaSchedules[dcaOwner][scheduleId].tradeFrequency *
                     numExec);
         }
 
-        //second, update purchase amounts for dcaOwner
         userTokenBalances[dcaOwner][
             userToDcaSchedules[dcaOwner][scheduleId].buyToken
         ] =
@@ -86,23 +80,19 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             ] +
             boughtAmount;
 
-        //third, update schedule details
         userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[
                 1
             ] = currentDateTime;
         userToDcaSchedules[dcaOwner][scheduleId].soldAmount += soldAmount;
         userToDcaSchedules[dcaOwner][scheduleId].boughtAmount += boughtAmount;
 
-        //fourth, update gas balance for user
         uint256 gasCalc = (gasUsed + (startGas - gasleft())) * tx.gasprice;
         userGasBalances[dcaOwner] -= gasCalc;
         userToDcaSchedules[dcaOwner][scheduleId].totalGas += gasCalc;
 
-        //then refund gas to owner
         (bool success, ) = msg.sender.call{value: gasCalc}("");
         require(success, "Gas refund failed!");
 
-        //finally emit event with all the updates/details
         DcaSchedule memory u = userToDcaSchedules[dcaOwner][scheduleId];
         uint256 remGas = userGasBalances[dcaOwner];
         {
@@ -136,23 +126,19 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
     ) external payable onlyOwner {
         uint256 startGas = gasleft();
 
-        //not enough gas check
         require(userGasBalances[dcaOwner] > currentGasPrice, "Low Gas!");
 
-        //schedule not ready to execute
         require(
             currentDateTime >=
                 userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2], //startDate, lastRun, nextRun, endDate
             "Not Ready!"
         );
 
-        //schedule not active
         require(
             userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
             "Complete!"
         );
 
-        //check if user has enough for trade
         address sellTokenAddress = userToDcaSchedules[dcaOwner][scheduleId]
             .sellToken;
         uint256 sellAmount = userToDcaSchedules[dcaOwner][scheduleId]
@@ -162,7 +148,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             "Low Balance!"
         );
 
-        //check rem budget
         require(
             userToDcaSchedules[dcaOwner][scheduleId].remainingBudget > 0,
             "Schedule complete!"
@@ -173,7 +158,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             userToDcaSchedules[dcaOwner][scheduleId].buyToken
         );
 
-        //approve sell token max
         if (!isETH(sellToken)) {
             if (
                 sellToken.allowance(address(this), aggRouter1inch) < sellAmount
@@ -182,7 +166,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             }
         }
 
-        //get current balance of buytoken
         uint256 boughtAmount;
         if (!isETH(buyToken)) {
             boughtAmount = buyToken.balanceOf(address(this));
@@ -190,7 +173,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             boughtAmount = address(this).balance;
         }
 
-        //get current balance of selltoken
         uint256 soldAmount;
         if (!isETH(sellToken)) {
             soldAmount = sellToken.balanceOf(address(this));
@@ -198,7 +180,6 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             soldAmount = address(this).balance;
         }
 
-        //perform 1inch swap
         assembly {
             let result := call(
                 gas(),
@@ -216,14 +197,12 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             }
         }
 
-        //get updated balance post swap of buytoken
         if (!isETH(buyToken)) {
             boughtAmount = buyToken.balanceOf(address(this)) - boughtAmount;
         } else {
             boughtAmount = address(this).balance - boughtAmount;
         }
 
-        //get updated balance post swap of selltoken
         if (!isETH(sellToken)) {
             soldAmount = soldAmount - sellToken.balanceOf(address(this));
         } else {

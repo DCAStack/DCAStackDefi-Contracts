@@ -9,7 +9,6 @@ contract UserScheduleData {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     struct DcaSchedule {
-        // address dcaOwner;
         uint256 tradeFrequency;
         uint256 tradeAmount;
         uint256 remainingBudget;

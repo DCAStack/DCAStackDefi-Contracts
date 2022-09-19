@@ -28,7 +28,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         return userToDcaSchedules[msg.sender];
     }
 
-    //get gas deposited not in use by schedules (excludes paused)
     function getFreeGasBalance(uint256 currGasEstimate)
         public
         view
@@ -50,7 +49,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
                         allUserSchedules[i].tradeFrequency,
                         allUserSchedules[i].scheduleDates[2],
                         allUserSchedules[i].scheduleDates[3]
-                        //startDate, lastRun, nextRun, endDate
                     );
 
                     committedGasBal += int256(remExec * currGasEstimate);
@@ -63,7 +61,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         return freeGasBal;
     }
 
-    //get funds deposited not in use by schedules (excludes paused)
     function getFreeTokenBalance(address _tokenAddress)
         public
         view
@@ -177,7 +174,6 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         return neededDeposit;
     }
 
-    //validate schedule before creation
     function validateDcaSchedule(
         address _sellToken,
         uint256 _tradeAmount,
