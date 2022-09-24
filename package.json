@@ -42,6 +42,7 @@
     "web3": "^1.7.4"
   },
   "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "axios": "^0.27.2"
   }
 }

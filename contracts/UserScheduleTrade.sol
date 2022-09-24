@@ -2,13 +2,17 @@
 
 pragma solidity ^0.8.9;
 
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./UserBankData.sol";
 import "./UserScheduleData.sol";
 
 //contract executes User DCA Schedules
-contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
+contract UserScheduleTrade is
+    UserBankData,
+    UserScheduleData,
+    ReentrancyGuardUpgradeable
+{
     uint256 constant MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
@@ -112,8 +116,8 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
         }
     }
 
-    function isETH(IERC20 token) internal pure returns (bool) {
-        return (token == IERC20(ETH));
+    function isETH(IERC20Upgradeable token) internal pure returns (bool) {
+        return (token == IERC20Upgradeable(ETH));
     }
 
     function runUserDCA(
@@ -153,8 +157,8 @@ contract UserScheduleTrade is UserBankData, UserScheduleData, ReentrancyGuard {
             "Schedule complete!"
         );
 
-        IERC20 sellToken = IERC20(sellTokenAddress);
-        IERC20 buyToken = IERC20(
+        IERC20Upgradeable sellToken = IERC20Upgradeable(sellTokenAddress);
+        IERC20Upgradeable buyToken = IERC20Upgradeable(
             userToDcaSchedules[dcaOwner][scheduleId].buyToken
         );
 

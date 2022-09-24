@@ -102,6 +102,10 @@ const config: HardhatUserConfig = {
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.POLYGON_ALCHEMY_ID}`,
       accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
+    },
+    goerli: {
+      url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_ID}`,
+      accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
     }
   },
   gasReporter: {

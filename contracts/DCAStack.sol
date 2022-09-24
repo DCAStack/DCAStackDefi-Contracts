@@ -8,5 +8,7 @@ import "./UserScheduleFactory.sol";
 
 /// @custom:security-contact admin@dcastack.com
 contract DCAStack is UserScheduleTrade, UserScheduleBank, UserScheduleFactory {
-
+    function initialize() public initializer {
+        __Ownable_init();
+    }
 }

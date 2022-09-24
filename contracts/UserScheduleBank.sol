@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.9;
 
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {SafeERC20Upgradeable, IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import "./UserBankData.sol";
 
 //contract contains User Funds
-contract UserScheduleBank is UserBankData, ReentrancyGuard {
-    using SafeERC20 for IERC20;
+contract UserScheduleBank is UserBankData, ReentrancyGuardUpgradeable {
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     event FundsDeposited(address indexed sender, address token, uint256 amount);
     event FundsWithdrawn(
@@ -59,7 +59,7 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
         if (_tokenAddress == ETH) {
             depositAmount = msg.value;
         } else {
-            IERC20 token = IERC20(_tokenAddress);
+            IERC20Upgradeable token = IERC20Upgradeable(_tokenAddress);
             uint256 preBalance = token.balanceOf(address(this));
             token.safeTransferFrom(msg.sender, address(this), _tokenAmount);
             uint256 postBalance = token.balanceOf(address(this));
@@ -92,8 +92,8 @@ contract UserScheduleBank is UserBankData, ReentrancyGuard {
             (bool success, ) = msg.sender.call{value: _tokenAmount}("");
             require(success, "withdrawFunds failed!");
         } else {
-            SafeERC20.safeTransfer(
-                IERC20(_tokenAddress),
+            SafeERC20Upgradeable.safeTransfer(
+                IERC20Upgradeable(_tokenAddress),
                 msg.sender,
                 _tokenAmount
             );
