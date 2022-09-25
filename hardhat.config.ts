@@ -99,6 +99,7 @@ const config: HardhatUserConfig = {
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.POLYGON_ALCHEMY_ID}`,
       accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
+
     },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_ID}`,
@@ -110,14 +111,12 @@ const config: HardhatUserConfig = {
     currency: "USD",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
-  verify: { //hardhat deploy verify
-    etherscan: {
-      apiKey: process.env.ETHERSCAN_API_KEY,
-    },
-  },
 
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      polygon: process.env.POLYGONSCAN_API_KEY ? process.env.POLYGONSCAN_API_KEY : "",
+      goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : "",
+    }
   },
 };
 
