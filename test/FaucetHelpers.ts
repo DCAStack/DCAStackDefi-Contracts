@@ -85,7 +85,7 @@ export const getFaucetByToken = (tokenAddress: string): string => {
       return "0x742d35Cc6634C0532925a3b844Bc454e4438f44e";
 
     case "0x6b175474e89094c44da98b954eedeac495271d0f":
-      return "0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503";
+      return "0x8EB8a3b98659Cce290402893d0123abb75E3ab28";
 
     case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
       return "0x3EB01B3391EA15CE752d01Cf3D3F09deC596F650";

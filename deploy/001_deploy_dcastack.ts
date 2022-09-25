@@ -8,8 +8,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const { deployer } = await getNamedAccounts();
 
-    console.log("ius", deployer)
-
     const got = await deploy("DCAStack", {
         from: deployer,
         log: true,

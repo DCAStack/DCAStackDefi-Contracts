@@ -182,6 +182,8 @@ contract UserScheduleFactory is UserBankData, UserScheduleData {
         uint256 _endDate,
         uint256 _currGasEstimate
     ) public view {
+        require(_sellToken != ETH, "Not supported!");
+
         uint256 needAmount = calculateDeposit(
             _tradeAmount,
             _tradeFrequency,

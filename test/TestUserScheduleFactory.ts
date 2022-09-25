@@ -7,6 +7,7 @@ import {
   ETH_ADDRESS,
   DAI_ADDRESS,
   DAI_CHECKSUM,
+  WETH_ADDRESS,
 } from "./FaucetHelpers";
 import { ethers, deployments, getNamedAccounts } from "hardhat";
 
@@ -42,9 +43,9 @@ describe("UserScheduleFactory Test Suite", function () {
         value: depositAmount,
       });
 
-      expect(tx)
+      await expect(tx)
         .to.emit(DCAStack, "FundsDeposited")
-        .withArgs(addr1, ETH_ADDRESS, depositAmount);
+        .withArgs(addr1.address, ETH_ADDRESS, depositAmount);
 
       userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
       expect(userDepositedBal).to.eq(depositAmount);
@@ -56,11 +57,23 @@ describe("UserScheduleFactory Test Suite", function () {
       let userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
       expect(userDepositedBal).to.eq(0);
 
-      DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
+      const tx = await DCAStack.connect(addr1).depositGas({
         value: depositAmount,
       });
+
+      await expect(tx)
+        .to.emit(DCAStack, "FundsDeposited")
+        .withArgs(addr1.address, ETH_ADDRESS, depositAmount);
+
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
+      await dai.connect(addr1).approve(DCAStack.address, depositAmount);
+
+      const tx2 = DCAStack.connect(addr1).depositFunds(DAI_ADDRESS, depositAmount);
+
+      await expect(tx2)
+        .to.emit(DCAStack, "FundsDeposited")
+        .withArgs(ethers.utils.getAddress(addr1.address), DAI_CHECKSUM, depositAmount);
+
 
       userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
       expect(userDepositedBal).to.eq(depositAmount);
@@ -69,8 +82,8 @@ describe("UserScheduleFactory Test Suite", function () {
         DCAStack.connect(addr1).createDcaSchedule(
           86400,
           ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
           ETH_ADDRESS,
+          DAI_ADDRESS,
           new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
           new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
           ethers.utils.parseEther("0.01")
@@ -95,9 +108,10 @@ describe("UserScheduleFactory Test Suite", function () {
 
       await DCAStack.connect(addr1).depositGas({ value: depositAmount });
 
-      await DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
+      await dai.connect(addr1).approve(DCAStack.address, depositAmount);
+
+      await DCAStack.connect(addr1).depositFunds(DAI_ADDRESS, depositAmount);
 
       userDepositedBal = await DCAStack.connect(addr1).getFreeGasBalance(0);
       expect(userDepositedBal).to.eq(depositAmount);
@@ -106,8 +120,8 @@ describe("UserScheduleFactory Test Suite", function () {
         DCAStack.connect(addr1).createDcaSchedule(
           86400,
           ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
           ETH_ADDRESS,
+          DAI_ADDRESS,
           new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
           new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
           ethers.utils.parseEther("0.01")
@@ -124,84 +138,6 @@ describe("UserScheduleFactory Test Suite", function () {
   });
 
   describe("Schedule Helper Free Token Balances", function () {
-    it("Should calculate free token balance ETH with active schedule", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
-
-      let userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(0);
-
-      await DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
-
-      await DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          86400,
-          ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
-          new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
-          ethers.utils.parseEther("0.01")
-        )
-      ).to.not.be.reverted;
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(
-        depositAmount.sub(ethers.utils.parseEther("0.07"))
-      );
-    });
-
-
-
-    it("Should calculate free token balance ETH negative case", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
-
-      let userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(0);
-
-      await DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
-
-      await DCAStack.connect(addr1).depositGas({ value: depositAmount });
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(depositAmount);
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          86400,
-          ethers.utils.parseEther("0.01"),
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000,
-          new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000,
-          ethers.utils.parseEther("0.01")
-        )
-      ).to.not.be.reverted;
-      await DCAStack.connect(addr1).withdrawFunds(ETH_ADDRESS, depositAmount);
-
-      userDepositedBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedBal).to.eq(ethers.utils.parseEther("-0.07"));
-    });
 
     it("Should calculate free token balance ETH no schedules", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
@@ -265,7 +201,7 @@ describe("UserScheduleFactory Test Suite", function () {
       );
     });
 
-    
+
 
     it("Should calculate free token balance DAI negative case", async function () {
       const depositAmount: BigNumber = ethers.utils.parseEther("1");
@@ -331,45 +267,6 @@ describe("UserScheduleFactory Test Suite", function () {
       ).to.eq(0);
     });
 
-    it("Should calculate free token balance multiasset", async function () {
-      const depositAmount: BigNumber = ethers.utils.parseEther("1");
-      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, depositAmount);
-      await dai.connect(addr1).approve(DCAStack.address, depositAmount);
-
-      let userDepositedEthBal = await DCAStack.connect(
-        addr1
-      ).getFreeTokenBalance(ETH_ADDRESS);
-      expect(userDepositedEthBal).to.eq(0);
-
-      DCAStack.connect(addr1).depositFunds(ETH_ADDRESS, depositAmount, {
-        value: depositAmount,
-      });
-
-      userDepositedEthBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        ETH_ADDRESS
-      );
-      expect(userDepositedEthBal).to.eq(depositAmount);
-
-      expect(
-        await DCAStack.connect(addr2).getFreeTokenBalance(ETH_ADDRESS)
-      ).to.eq(0);
-
-      let userDepositedDaiBal = await DCAStack.connect(
-        addr1
-      ).getFreeTokenBalance(DAI_ADDRESS);
-      expect(userDepositedDaiBal).to.eq(0);
-
-      DCAStack.connect(addr1).depositFunds(DAI_ADDRESS, depositAmount);
-
-      userDepositedDaiBal = await DCAStack.connect(addr1).getFreeTokenBalance(
-        DAI_ADDRESS
-      );
-      expect(userDepositedDaiBal).to.eq(depositAmount);
-
-      expect(
-        await DCAStack.connect(addr2).getFreeTokenBalance(DAI_ADDRESS)
-      ).to.eq(0);
-    });
   });
 
   describe("Schedule Helper Executions", function () {
@@ -731,59 +628,7 @@ describe("UserScheduleFactory Test Suite", function () {
   });
 
   describe("Schedule Helper Validation", function () {
-    it("Should validate schedule ETH_ADDRESS", async function () {
-      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
-      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
-      const tradeFreq = 1 * 86400;
-      const tradeAmount = ethers.utils.parseEther("1");
 
-      // missing deposit
-      await expect(
-        DCAStack.connect(addr1).validateDcaSchedule(
-          ETH_ADDRESS,
-          tradeAmount,
-          tradeFreq,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      ).to.be.reverted;
-
-      DCAStack.connect(addr1).depositFunds(
-        ETH_ADDRESS,
-        ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
-      );
-
-      // missing gas
-      await expect(
-        DCAStack.connect(addr1).validateDcaSchedule(
-          ETH_ADDRESS,
-          tradeAmount,
-          tradeFreq,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      ).to.be.reverted;
-
-      DCAStack.connect(addr1).depositGas({
-        value: ethers.utils.parseEther("1"),
-      });
-
-      await expect(
-        DCAStack.connect(addr1).validateDcaSchedule(
-          ETH_ADDRESS,
-          tradeAmount,
-          tradeFreq,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      ).to.not.be.reverted;
-    });
 
     it("Should validate schedule DAI_ADDRESS", async function () {
       await getTokenFromFaucet(
@@ -890,86 +735,8 @@ describe("UserScheduleFactory Test Suite", function () {
   });
 
   describe("Schedule Creation", function () {
-    it("Should create daily DCA schedule for DAI/ETH", async function () {
-      let getSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      expect(getSchedules.length).to.equal(0);
 
-      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
-      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
-      const tradeAmount = ethers.utils.parseEther("1");
-      const tradeFreq = 1 * 86400; // trade daily
-
-      // missing deposit
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          tradeFreq,
-          tradeAmount,
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      ).to.be.reverted;
-
-      DCAStack.connect(addr1).depositFunds(
-        ETH_ADDRESS,
-        ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
-      );
-
-      // missing gas
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          tradeFreq,
-          tradeAmount,
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      ).to.be.reverted;
-
-      DCAStack.connect(addr1).depositGas({
-        value: ethers.utils.parseEther("1"),
-      });
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          tradeFreq,
-          tradeAmount,
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      )
-        .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
-
-      getSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      expect(getSchedules.length).to.equal(1);
-
-      expect(getSchedules[0].tradeFrequency).to.eq(tradeFreq);
-      expect(getSchedules[0].tradeAmount).to.eq(tradeAmount);
-      expect(getSchedules[0].remainingBudget).to.eq(
-        ethers.utils.parseEther("7")
-      );
-      //   expect(getSchedules[0].totalBudget).to.eq(ethers.utils.parseEther("7"));
-      expect(getSchedules[0].buyToken).to.eq(DAI_CHECKSUM);
-      expect(getSchedules[0].sellToken).to.eq(ETH_ADDRESS);
-      expect(getSchedules[0].isActive).to.eq(true);
-      expect(getSchedules[0].scheduleDates[0]).to.eq(startDate);
-      expect(getSchedules[0].scheduleDates[1]).to.eq(0);
-      expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
-      expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
-    });
-
-    it("Should create daily DCA schedule for ETH/DAI_ADDRESS", async function () {
+    it("Should create daily DCA schedule for ETH/DAI", async function () {
       await getTokenFromFaucet(
         DAI_ADDRESS,
         addr1.address,
@@ -1052,106 +819,6 @@ describe("UserScheduleFactory Test Suite", function () {
       expect(getSchedules[0].scheduleDates[1]).to.eq(0);
       expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
       expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
-    });
-
-    it("Should create multiasset schedules", async function () {
-      await getTokenFromFaucet(
-        DAI_ADDRESS,
-        addr1.address,
-        ethers.utils.parseEther("7")
-      );
-      await dai
-        .connect(addr1)
-        .approve(DCAStack.address, ethers.utils.parseEther("7"));
-
-      let getSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      expect(getSchedules.length).to.equal(0);
-
-      const startDate = new Date("Fri Jul 08 2022 20:26:13").getTime() / 1000;
-      const endDate = new Date("Fri Jul 15 2022 20:26:13").getTime() / 1000;
-      const tradeAmount = ethers.utils.parseEther("1");
-      const tradeFreq = 1 * 86400; // trade daily
-
-      DCAStack.connect(addr1).depositFunds(
-        DAI_ADDRESS,
-        ethers.utils.parseEther("7")
-      );
-      DCAStack.connect(addr1).depositGas({
-        value: ethers.utils.parseEther("1"),
-      });
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          tradeFreq,
-          tradeAmount,
-          ETH_ADDRESS,
-          DAI_ADDRESS,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      )
-        .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(0, ETH_ADDRESS, DAI_CHECKSUM, addr1.address);
-
-      getSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      expect(getSchedules.length).to.equal(1);
-
-      expect(getSchedules[0].tradeFrequency).to.eq(tradeFreq);
-      expect(getSchedules[0].tradeAmount).to.eq(tradeAmount);
-      expect(getSchedules[0].remainingBudget).to.eq(
-        ethers.utils.parseEther("7")
-      );
-      // expect(getSchedules[0].totalBudget).to.eq(ethers.utils.parseEther("7"));
-      expect(getSchedules[0].buyToken).to.eq(ETH_ADDRESS);
-      expect(getSchedules[0].sellToken).to.eq(DAI_CHECKSUM);
-      expect(getSchedules[0].isActive).to.eq(true);
-      expect(getSchedules[0].scheduleDates[0]).to.eq(startDate);
-      expect(getSchedules[0].scheduleDates[1]).to.eq(0);
-      expect(getSchedules[0].scheduleDates[2]).to.eq(startDate);
-      expect(getSchedules[0].scheduleDates[3]).to.eq(endDate);
-
-      DCAStack.connect(addr1).depositFunds(
-        ETH_ADDRESS,
-        ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
-      );
-      DCAStack.connect(addr1).depositGas({
-        value: ethers.utils.parseEther("1"),
-      });
-
-      await expect(
-        DCAStack.connect(addr1).createDcaSchedule(
-          tradeFreq,
-          tradeAmount,
-          DAI_ADDRESS,
-          ETH_ADDRESS,
-          startDate,
-          endDate,
-          BigNumber.from(1)
-        )
-      )
-        .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(1, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
-
-      getSchedules = await DCAStack.connect(addr1).getUserSchedules();
-      expect(getSchedules.length).to.equal(2);
-
-      expect(getSchedules[1].tradeFrequency).to.eq(tradeFreq);
-      expect(getSchedules[1].tradeAmount).to.eq(tradeAmount);
-      expect(getSchedules[1].remainingBudget).to.eq(
-        ethers.utils.parseEther("7")
-      );
-      //   expect(getSchedules[0].totalBudget).to.eq(ethers.utils.parseEther("7"));
-      expect(getSchedules[1].buyToken).to.eq(DAI_CHECKSUM);
-      expect(getSchedules[1].sellToken).to.eq(ETH_ADDRESS);
-      expect(getSchedules[1].isActive).to.eq(true);
-      expect(getSchedules[1].scheduleDates[0]).to.eq(startDate);
-      expect(getSchedules[1].scheduleDates[1]).to.eq(0);
-      expect(getSchedules[1].scheduleDates[2]).to.eq(startDate);
-      expect(getSchedules[1].scheduleDates[3]).to.eq(endDate);
     });
 
     it("Should create schedule invalid", async function () {
@@ -1229,12 +896,12 @@ describe("UserScheduleFactory Test Suite", function () {
       const tradeAmount = ethers.utils.parseEther("1");
       const tradeFreq = 1 * 86400; // trade daily
 
+      await getTokenFromFaucet(DAI_ADDRESS, addr1.address, ethers.utils.parseEther("100"));
+      await dai.connect(addr1).approve(DCAStack.address, ethers.utils.parseEther("100"));
+
       DCAStack.connect(addr1).depositFunds(
-        ETH_ADDRESS,
+        DAI_ADDRESS,
         ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
       );
 
       DCAStack.connect(addr1).depositGas({
@@ -1245,27 +912,27 @@ describe("UserScheduleFactory Test Suite", function () {
         DCAStack.connect(addr1).createDcaSchedule(
           tradeFreq,
           tradeAmount,
-          DAI_ADDRESS,
           ETH_ADDRESS,
+          DAI_ADDRESS,
           startDate,
           endDate,
           BigNumber.from(1)
         )
       )
         .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
+        .withArgs(0, ETH_ADDRESS, DAI_CHECKSUM, addr1.address);
 
       expect(await DCAStack.getAllUsersSchedules()).to.deep.equal([
         [addr1.address],
         [BigNumber.from("1")],
       ]);
 
+      await getTokenFromFaucet(DAI_ADDRESS, addr2.address, ethers.utils.parseEther("100"));
+      await dai.connect(addr2).approve(DCAStack.address, ethers.utils.parseEther("100"));
+
       DCAStack.connect(addr2).depositFunds(
-        ETH_ADDRESS,
+        DAI_ADDRESS,
         ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
       );
 
       DCAStack.connect(addr2).depositGas({
@@ -1276,15 +943,15 @@ describe("UserScheduleFactory Test Suite", function () {
         DCAStack.connect(addr2).createDcaSchedule(
           tradeFreq,
           tradeAmount,
-          DAI_ADDRESS,
           ETH_ADDRESS,
+          DAI_ADDRESS,
           startDate,
           endDate,
           BigNumber.from(1)
         )
       )
         .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr2.address);
+        .withArgs(0, ETH_ADDRESS, DAI_CHECKSUM, addr2.address);
 
       expect(await DCAStack.getAllUsersSchedules()).to.deep.equal([
         [addr1.address, addr2.address],
@@ -1292,11 +959,8 @@ describe("UserScheduleFactory Test Suite", function () {
       ]);
 
       DCAStack.connect(addr2).depositFunds(
-        ETH_ADDRESS,
+        DAI_ADDRESS,
         ethers.utils.parseEther("7"),
-        {
-          value: ethers.utils.parseEther("7"),
-        }
       );
 
       DCAStack.connect(addr2).depositGas({
@@ -1307,15 +971,15 @@ describe("UserScheduleFactory Test Suite", function () {
         DCAStack.connect(addr2).createDcaSchedule(
           tradeFreq,
           tradeAmount,
-          DAI_ADDRESS,
           ETH_ADDRESS,
+          DAI_ADDRESS,
           startDate,
           endDate,
           BigNumber.from(1)
         )
       )
         .to.emit(DCAStack, "NewUserSchedule")
-        .withArgs(1, DAI_CHECKSUM, ETH_ADDRESS, addr2.address);
+        .withArgs(1, ETH_ADDRESS, DAI_CHECKSUM, addr2.address);
 
       expect(await DCAStack.getAllUsersSchedules()).to.deep.equal([
         [addr1.address, addr2.address],

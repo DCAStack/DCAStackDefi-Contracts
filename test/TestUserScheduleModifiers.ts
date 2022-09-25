@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers, deployments, getNamedAccounts } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { IERC20 } from "../typechain";
-import { ETH_ADDRESS, DAI_ADDRESS, DAI_CHECKSUM } from "./FaucetHelpers";
+import { ETH_ADDRESS, DAI_ADDRESS, DAI_CHECKSUM, getTokenFromFaucet } from "./FaucetHelpers";
 import { BigNumber, Contract } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 
@@ -30,12 +30,16 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
     );
 
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+    dai = <IERC20>await ethers.getContractAt("IERC20", DAI_ADDRESS);
+
+    await getTokenFromFaucet(DAI_ADDRESS, addr1.address, ethers.utils.parseEther("100"));
+    await dai.connect(addr1).approve(DCAStack.address, ethers.utils.parseEther("100"));
 
     let getSchedules = await DCAStack.connect(addr1).getUserSchedules();
     expect(getSchedules.length).to.equal(0);
 
     DCAStack.connect(addr1).depositFunds(
-      ETH_ADDRESS,
+      DAI_ADDRESS,
       ethers.utils.parseEther("0.7"),
       {
         value: ethers.utils.parseEther("0.7"),
@@ -58,15 +62,15 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
       DCAStack.connect(addr1).createDcaSchedule(
         tradeFreq,
         tradeAmount,
-        DAI_ADDRESS,
         ETH_ADDRESS,
+        DAI_ADDRESS,
         startDate,
         endDate,
         parseEther("0.0000001")
       )
     )
       .to.emit(DCAStack, "NewUserSchedule")
-      .withArgs(0, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
+      .withArgs(0, ETH_ADDRESS, DAI_CHECKSUM, addr1.address);
 
     getSchedules = await DCAStack.connect(addr1).getUserSchedules();
     expect(getSchedules.length).to.equal(1);
@@ -95,7 +99,7 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
     it("Should delete schedule multiple", async function () {
       for (let i = 0; i < 9; i++) {
         DCAStack.connect(addr1).depositFunds(
-          ETH_ADDRESS,
+          DAI_ADDRESS,
           ethers.utils.parseEther("7"),
           {
             value: ethers.utils.parseEther("7"),
@@ -109,15 +113,15 @@ describe("UserScheduleFactory Schedule Modifiers Test Suite", function () {
           DCAStack.connect(addr1).createDcaSchedule(
             tradeFreq,
             tradeAmount,
-            DAI_ADDRESS,
             ETH_ADDRESS,
+            DAI_ADDRESS,
             startDate,
             endDate,
             BigNumber.from(1)
           )
         )
           .to.emit(DCAStack, "NewUserSchedule")
-          .withArgs(i + 1, DAI_CHECKSUM, ETH_ADDRESS, addr1.address);
+          .withArgs(i + 1, ETH_ADDRESS, DAI_CHECKSUM, addr1.address);
       }
 
       let getSchedules = await DCAStack.connect(addr1).getUserSchedules();

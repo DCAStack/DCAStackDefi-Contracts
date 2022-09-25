@@ -33,12 +33,13 @@ contract UserScheduleTrade is
     function updateUserDCA(
         address dcaOwner,
         uint256 scheduleId,
-        uint256 soldAmount,
-        uint256 boughtAmount,
+        uint256[2] memory tradeAmounts,
         uint256 gasUsed,
         uint256 currentDateTime
     ) internal nonReentrant onlyOwner {
         uint256 startGas = gasleft();
+        uint256 soldAmount = tradeAmounts[0];
+        uint256 boughtAmount = tradeAmounts[1];
 
         userToDcaSchedules[dcaOwner][scheduleId].remainingBudget =
             userToDcaSchedules[dcaOwner][scheduleId].remainingBudget -
@@ -125,49 +126,67 @@ contract UserScheduleTrade is
         uint256 scheduleId,
         uint256 currentGasPrice,
         uint256 currentDateTime,
-        bytes memory swapCallData,
-        address aggRouter1inch
+        address spender,
+        address payable swapTarget,
+        bytes calldata swapCallData
     ) external payable onlyOwner {
         uint256 startGas = gasleft();
+
+        DcaSchedule memory currSchedule = userToDcaSchedules[dcaOwner][
+            scheduleId
+        ];
+
+        require(
+            currentDateTime >= currSchedule.scheduleDates[2], //startDate, lastRun, nextRun, endDate
+            "Not Ready!"
+        );
+
+        require(currSchedule.isActive == true, "Complete!");
+
+        require(currSchedule.remainingBudget > 0, "Schedule complete!");
 
         require(userGasBalances[dcaOwner] > currentGasPrice, "Low Gas!");
 
         require(
-            currentDateTime >=
-                userToDcaSchedules[dcaOwner][scheduleId].scheduleDates[2], //startDate, lastRun, nextRun, endDate
-            "Not Ready!"
-        );
-
-        require(
-            userToDcaSchedules[dcaOwner][scheduleId].isActive == true,
-            "Complete!"
-        );
-
-        address sellTokenAddress = userToDcaSchedules[dcaOwner][scheduleId]
-            .sellToken;
-        uint256 sellAmount = userToDcaSchedules[dcaOwner][scheduleId]
-            .tradeAmount;
-        require(
-            userTokenBalances[dcaOwner][sellTokenAddress] >= sellAmount,
+            userTokenBalances[dcaOwner][currSchedule.sellToken] >=
+                currSchedule.tradeAmount,
             "Low Balance!"
         );
 
-        require(
-            userToDcaSchedules[dcaOwner][scheduleId].remainingBudget > 0,
-            "Schedule complete!"
+        IERC20Upgradeable sellToken = IERC20Upgradeable(currSchedule.sellToken);
+        IERC20Upgradeable buyToken = IERC20Upgradeable(currSchedule.buyToken);
+
+        uint256[2] memory tradeAmounts = swap(
+            currSchedule,
+            sellToken,
+            buyToken,
+            spender,
+            swapTarget,
+            swapCallData
         );
 
-        IERC20Upgradeable sellToken = IERC20Upgradeable(sellTokenAddress);
-        IERC20Upgradeable buyToken = IERC20Upgradeable(
-            userToDcaSchedules[dcaOwner][scheduleId].buyToken
+        updateUserDCA(
+            dcaOwner,
+            scheduleId,
+            tradeAmounts,
+            startGas - gasleft(),
+            currentDateTime
         );
+    }
 
-        if (!isETH(sellToken)) {
-            if (
-                sellToken.allowance(address(this), aggRouter1inch) < sellAmount
-            ) {
-                sellToken.approve(aggRouter1inch, MAX_INT);
-            }
+    function swap(
+        DcaSchedule memory currSchedule,
+        IERC20Upgradeable sellToken,
+        IERC20Upgradeable buyToken,
+        address spender,
+        address payable swapTarget,
+        bytes calldata swapCallData
+    ) internal onlyOwner returns (uint256[2] memory) {
+        if (
+            sellToken.allowance(address(this), spender) <
+            currSchedule.tradeAmount
+        ) {
+            sellToken.approve(spender, MAX_INT);
         }
 
         uint256 boughtAmount;
@@ -177,29 +196,10 @@ contract UserScheduleTrade is
             boughtAmount = address(this).balance;
         }
 
-        uint256 soldAmount;
-        if (!isETH(sellToken)) {
-            soldAmount = sellToken.balanceOf(address(this));
-        } else {
-            soldAmount = address(this).balance;
-        }
+        uint256 soldAmount = sellToken.balanceOf(address(this));
 
-        assembly {
-            let result := call(
-                gas(),
-                aggRouter1inch,
-                callvalue(),
-                add(swapCallData, 0x20),
-                mload(swapCallData),
-                0,
-                0
-            )
-            returndatacopy(0, 0, returndatasize())
-            switch result
-            case 0 {
-                revert(0, returndatasize())
-            }
-        }
+        (bool success, ) = swapTarget.call{value: msg.value}(swapCallData);
+        require(success, "SWAP_CALL_FAILED");
 
         if (!isETH(buyToken)) {
             boughtAmount = buyToken.balanceOf(address(this)) - boughtAmount;
@@ -207,19 +207,8 @@ contract UserScheduleTrade is
             boughtAmount = address(this).balance - boughtAmount;
         }
 
-        if (!isETH(sellToken)) {
-            soldAmount = soldAmount - sellToken.balanceOf(address(this));
-        } else {
-            soldAmount = soldAmount - address(this).balance;
-        }
+        soldAmount = soldAmount - sellToken.balanceOf(address(this));
 
-        updateUserDCA(
-            dcaOwner,
-            scheduleId,
-            soldAmount,
-            boughtAmount,
-            startGas - gasleft(),
-            currentDateTime
-        );
+        return [soldAmount, boughtAmount];
     }
 }
