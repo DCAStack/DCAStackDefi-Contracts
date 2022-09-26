@@ -2,22 +2,21 @@
 
 pragma solidity ^0.8.9;
 
-import {EnumerableSetUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
-import {SafeERC20Upgradeable, IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
 //contract contains User Funds
 contract UserBankData is OwnableUpgradeable {
-    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
-    using SafeERC20Upgradeable for IERC20Upgradeable;
+    using EnumerableSet for EnumerableSet.AddressSet;
+    using SafeERC20 for IERC20;
 
     mapping(address => mapping(address => uint256)) public userTokenBalances;
-    mapping(address => EnumerableSetUpgradeable.AddressSet)
-        internal _userTokens;
+    mapping(address => EnumerableSet.AddressSet) internal _userTokens;
     mapping(address => uint256) public userGasBalances;
-    EnumerableSetUpgradeable.AddressSet internal _userGasAddresses;
+    EnumerableSet.AddressSet internal _userGasAddresses;
 
     function getUserTokensLength() internal view returns (uint256) {
         return _userTokens[msg.sender].length();

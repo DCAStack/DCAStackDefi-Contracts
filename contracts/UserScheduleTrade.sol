@@ -117,8 +117,8 @@ contract UserScheduleTrade is
         }
     }
 
-    function isETH(IERC20Upgradeable token) internal pure returns (bool) {
-        return (token == IERC20Upgradeable(ETH));
+    function isETH(IERC20 token) internal pure returns (bool) {
+        return (token == IERC20(ETH));
     }
 
     function runUserDCA(
@@ -153,8 +153,8 @@ contract UserScheduleTrade is
             "Low Balance!"
         );
 
-        IERC20Upgradeable sellToken = IERC20Upgradeable(currSchedule.sellToken);
-        IERC20Upgradeable buyToken = IERC20Upgradeable(currSchedule.buyToken);
+        IERC20 sellToken = IERC20(currSchedule.sellToken);
+        IERC20 buyToken = IERC20(currSchedule.buyToken);
 
         uint256[2] memory tradeAmounts = swap(
             currSchedule,
@@ -176,8 +176,8 @@ contract UserScheduleTrade is
 
     function swap(
         DcaSchedule memory currSchedule,
-        IERC20Upgradeable sellToken,
-        IERC20Upgradeable buyToken,
+        IERC20 sellToken,
+        IERC20 buyToken,
         address spender,
         address payable swapTarget,
         bytes calldata swapCallData

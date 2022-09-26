@@ -10,5 +10,6 @@ import "./UserScheduleFactory.sol";
 contract DCAStack is UserScheduleTrade, UserScheduleBank, UserScheduleFactory {
     function initialize() public initializer {
         __Ownable_init();
+        __ReentrancyGuard_init();
     }
 }

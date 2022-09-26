@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-import {EnumerableSetUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 //create new user schedule and validate
 contract UserScheduleData {
-    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     struct DcaSchedule {
         uint256 tradeFrequency;
@@ -22,7 +22,7 @@ contract UserScheduleData {
     }
 
     mapping(address => DcaSchedule[]) public userToDcaSchedules;
-    EnumerableSetUpgradeable.AddressSet internal _userAddresses;
+    EnumerableSet.AddressSet internal _userAddresses;
 
     function addUser() internal {
         _userAddresses.add(msg.sender);
