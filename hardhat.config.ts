@@ -10,12 +10,22 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+import { setupSafeDeployer } from "hardhat-safe-deployer";
+import { Wallet } from "@ethersproject/wallet";
 
 // Libraries
 import assert from "assert";
 import { exec } from "child_process";
 
 dotenv.config();
+
+const { DCASTACK_KEY, SAFE_SERVICE_URL, DEPLOYER_SAFE } = process.env;
+
+setupSafeDeployer(
+  new Wallet(DCASTACK_KEY!!),
+  DEPLOYER_SAFE!!,
+  SAFE_SERVICE_URL
+)
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -55,10 +65,11 @@ task(
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
 assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
-const { DEPLOYER_PRIVATE_KEY } = process.env;
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
+
+
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -78,7 +89,7 @@ const config: HardhatUserConfig = {
     },
   },
   namedAccounts: {
-    deployer: 0,
+    deployer: DEPLOYER_SAFE!!,
   },
   contractSizer: {
     alphaSort: true,
@@ -98,12 +109,12 @@ const config: HardhatUserConfig = {
     },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.POLYGON_ALCHEMY_ID}`,
-      accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
 
     },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_ID}`,
-      accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""]
+      accounts: [DCASTACK_KEY!!],
+      chainId: 5
     }
   },
   gasReporter: {
@@ -118,6 +129,7 @@ const config: HardhatUserConfig = {
       goerli: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : "",
     }
   },
+
 };
 
 export default config;

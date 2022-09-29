@@ -8,12 +8,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const { deployer } = await getNamedAccounts();
 
-    const got = await deploy("DCAStack", {
+    await deploy("DCAStack", {
         from: deployer,
         log: true,
         proxy: network.live == false ? false : {
             owner: deployer,
-            proxyContract: "OpenZeppelinTransparentProxy",
+            proxyContract: "OptimizedTransparentProxy",
             execute: {
                 init: {
                     methodName: 'initialize',
@@ -22,6 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             }
         }
     });
+
 
 };
 
