@@ -10,22 +10,12 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-contract-sizer";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
-import { setupSafeDeployer } from "hardhat-safe-deployer";
-import { Wallet } from "@ethersproject/wallet";
 
 // Libraries
 import assert from "assert";
 import { exec } from "child_process";
 
 dotenv.config();
-
-const { DCASTACK_KEY, SAFE_SERVICE_URL, DEPLOYER_SAFE } = process.env;
-
-setupSafeDeployer(
-  new Wallet(DCASTACK_KEY!!),
-  DEPLOYER_SAFE!!,
-  SAFE_SERVICE_URL
-)
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -89,7 +79,7 @@ const config: HardhatUserConfig = {
     },
   },
   namedAccounts: {
-    deployer: DEPLOYER_SAFE!!,
+    deployer: 0,
   },
   contractSizer: {
     alphaSort: true,
@@ -113,7 +103,7 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_ID}`,
-      accounts: [DCASTACK_KEY!!],
+      accounts: [process.env.DCASTACK_KEY ? process.env.DCASTACK_KEY : ""],
       chainId: 5
     }
   },

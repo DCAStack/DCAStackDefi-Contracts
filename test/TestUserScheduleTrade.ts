@@ -37,7 +37,7 @@ describe("UserScheduleTrade Test Suite", function () {
     DAI_IERC20 = await ethers.getContractAt("IERC20", DAI_ADDRESS);
     WETH_IERC20 = await ethers.getContractAt("IERC20", WETH_ADDRESS);
 
-    [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+    [owner, addr1, addr2, addr3, ...addrs] = await ethers.getSigners();
 
     const BaseFactory = (await ethers.getContractFactory(
       "DCAStack",
@@ -47,6 +47,11 @@ describe("UserScheduleTrade Test Suite", function () {
       initializer: "initialize",
     })) as Contract;
     await DCAStack.deployed();
+
+    //grant roles
+    const RUNNER_ROLE = await DCAStack.RUNNER_ROLE();
+    const grant = await DCAStack.connect(owner).grantRole(RUNNER_ROLE, addr3.address);
+    await expect(grant).to.emit(DCAStack, "RoleGranted").withArgs(RUNNER_ROLE, addr3.address, owner.address)
 
     // get DAI for addr1
     await getTokenFromFaucet(
@@ -129,7 +134,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const quote = await get0xQuote(DAI_ADDRESS, WETH_ADDRESS, tradeAmount.toString())
 
-      const tx = await DCAStack.runUserDCA(
+      const tx = await DCAStack.connect(addr3).runUserDCA(
         addr1.address,
         0,
         1,
@@ -237,7 +242,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const quote = await get0xQuote(DAI_ADDRESS, WETH_ADDRESS, tradeAmount.toString())
 
-      const tx = await DCAStack.runUserDCA(
+      const tx = await DCAStack.connect(addr3).runUserDCA(
         addr1.address,
         scheduleNum,
         1,
@@ -330,7 +335,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
-      const tx = await DCAStack.runUserDCA(
+      const tx = await DCAStack.connect(addr3).runUserDCA(
         addr1.address,
         scheduleNum,
         1,
@@ -431,7 +436,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
-      const tx = await DCAStack.runUserDCA(
+      const tx = await DCAStack.connect(addr3).runUserDCA(
         addr1.address,
         scheduleNum,
         1,
@@ -524,7 +529,7 @@ describe("UserScheduleTrade Test Suite", function () {
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
       await expect(
-        DCAStack.runUserDCA(
+        DCAStack.connect(addr3).runUserDCA(
           addr2.address,
           0,
           1,
@@ -569,7 +574,7 @@ describe("UserScheduleTrade Test Suite", function () {
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
       await expect(
-        DCAStack.runUserDCA(
+        DCAStack.connect(addr3).runUserDCA(
           addr2.address,
           0,
           1,
@@ -611,7 +616,7 @@ describe("UserScheduleTrade Test Suite", function () {
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
       await expect(
-        DCAStack.runUserDCA(
+        DCAStack.connect(addr3).runUserDCA(
           addr2.address,
           0,
           1,
@@ -629,7 +634,7 @@ describe("UserScheduleTrade Test Suite", function () {
 
       // reverts because schedule concluded
       await expect(
-        DCAStack.runUserDCA(
+        DCAStack.connect(addr3).runUserDCA(
           addr2.address,
           0,
           1,
@@ -671,7 +676,7 @@ describe("UserScheduleTrade Test Suite", function () {
       const quote = await get0xQuote(DAI_ADDRESS, ETH_ADDRESS, tradeAmount.toString())
 
       await expect(
-        DCAStack.runUserDCA(
+        DCAStack.connect(addr3).runUserDCA(
           addr2.address,
           0,
           1,

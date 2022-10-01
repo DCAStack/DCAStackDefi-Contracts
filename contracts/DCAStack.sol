@@ -11,5 +11,7 @@ contract DCAStack is UserScheduleTrade, UserScheduleBank, UserScheduleFactory {
     function initialize() external initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
+        __AccessControl_init();
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 }

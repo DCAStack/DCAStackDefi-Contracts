@@ -3,7 +3,7 @@
 pragma solidity ^0.8.9;
 
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "./UserBankData.sol";
 import "./UserScheduleData.sol";
 
@@ -11,10 +11,12 @@ import "./UserScheduleData.sol";
 contract UserScheduleTrade is
     UserBankData,
     UserScheduleData,
-    ReentrancyGuardUpgradeable
+    ReentrancyGuardUpgradeable,
+    AccessControlUpgradeable
 {
     uint256 constant MAX_INT =
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    bytes32 public constant RUNNER_ROLE = keccak256("RUNNER_ROLE");
 
     event BoughtTokens(
         uint256 indexed dcaScheduleId,
@@ -36,7 +38,7 @@ contract UserScheduleTrade is
         uint256[2] memory tradeAmounts,
         uint256 gasUsed,
         uint256 currentDateTime
-    ) internal nonReentrant onlyOwner {
+    ) internal nonReentrant onlyRole(RUNNER_ROLE) {
         uint256 startGas = gasleft();
         uint256 soldAmount = tradeAmounts[0];
         uint256 boughtAmount = tradeAmounts[1];
@@ -129,7 +131,7 @@ contract UserScheduleTrade is
         address spender,
         address payable swapTarget,
         bytes calldata swapCallData
-    ) external payable onlyOwner {
+    ) external payable onlyRole(RUNNER_ROLE) {
         uint256 startGas = gasleft();
 
         DcaSchedule memory currSchedule = userToDcaSchedules[dcaOwner][
@@ -181,7 +183,7 @@ contract UserScheduleTrade is
         address spender,
         address payable swapTarget,
         bytes calldata swapCallData
-    ) internal onlyOwner returns (uint256[2] memory) {
+    ) internal onlyRole(RUNNER_ROLE) returns (uint256[2] memory) {
         if (
             sellToken.allowance(address(this), spender) <
             currSchedule.tradeAmount
